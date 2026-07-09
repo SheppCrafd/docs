@@ -1,0 +1,9 @@
+/* Hide all Mintlify AI assistant UI (not available on Hobby plan) */
+#assistant-entry,
+#assistant-entry-mobile,
+#chat-assistant-sheet,
+chat-assistant-sheet,
+chat-assistant-floating-input,
+[data-component-name="primary-header-button"] {
+  display: none !important;
+}
