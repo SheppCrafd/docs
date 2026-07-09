@@ -23,21 +23,21 @@ The diagram below traces one full render cycle end-to-end.
 
 ```txt
  ┌────────────────────────────┐  coords + date   ┌────────────────────────────┐
- │        Browser APIs        │─────────────────▶│         Hebcal API         │
- │  Geolocation / DeviceOrient│                  │   /zmanim, /converter      │
- │  Notification / Storage    │◀─────────────────│      (JSON responses)      │
+ │       Browser APIs       │─────────────────▶│         Hebcal API         │
+ │Geolocation / DeviceOrient│                  │   /zmanim, /converter      │
+ │ Notification / Storage   │◀─────────────────│      (JSON responses)      │
  └────────────────────────────┘  times + parsha  └────────────────────────────┘
               │                                                │
               │                                                │
               ▼                                                ▼
  ┌────────────────────────────┐                  ┌────────────────────────────┐
- │      Geocoding APIs        │  city / tz / rev │        Sefaria API         │
- │  Open-Meteo · BigDataCloud │◀────────────────▶│  /api/index + text refs    │
- │        timeapi.io          │                  │    (siddur routes only)    │
+ │    Geocoding APIs       │  city / tz / rev │        Sefaria API         │
+ │Open-Meteo · BigDataCloud│◀────────────────▶│  /api/index + text refs    │
+ │      timeapi.io         │                  │    (siddur routes only)    │
  └────────────────────────────┘                  └────────────────────────────┘
-              │                                                │
-              └───────────────────────┬────────────────────────┘
-                                      ▼
+              │                                            │
+              └────────────────────────┬────────────────────────┘
+                                     ▼
  ┌──────────────────────────────────────────────────────────────────────────────┐
  │                       React UI (rendered per route)                          │
  │              Home · Zmanim · Compass · Siddur · Settings                     │
