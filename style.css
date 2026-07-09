@@ -45,6 +45,21 @@ body {
   overflow: auto !important;
 }
 
+/* Zero out the assistant sheet width variable Mintlify sets inline on <html>.
+   Even if the element itself is hidden, this CSS var reserves layout space. */
+html {
+  --assistant-sheet-width: 0px !important;
+  --chat-assistant-sheet-width: 0px !important;
+}
+
+/* Belt-and-suspenders: force closed state regardless of what Mintlify's JS sets */
+html[data-assistant-state],
+html[data-assistant-state="open"],
+html[data-assistant-state="opening"],
+html[data-assistant-state="closing"] {
+  --assistant-sheet-width: 0px !important;
+}
+
 /* Floating "Ask a question" bar at the bottom of the page */
 chat-assistant-floating-input,
 #chat-assistant-textarea,
