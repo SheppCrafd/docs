@@ -4,7 +4,7 @@ sidebarTitle: "Getting Started"
 description: "Open Zmanim Today in your browser, allow location access, and instantly see a personalised halachic prayer-times dashboard — no account required."
 ---
 
-In just a few taps you can open Zmanim Today in your browser, grant location access, and immediately see a personalised dashboard showing every halachic prayer time for today at your exact location. There is no account to create, no app store to visit, and no setup beyond allowing the browser's standard location prompt. This guide walks you through the complete process — from opening the app to installing it on your home screen for instant daily access.
+In just a few taps you can open Zmanim Today in your browser, grant location access, and immediately see a personalised dashboard showing every halachic prayer time for today at your exact location. There is no app store to visit, and no setup beyond allowing the browser's standard location prompt. This guide walks you through the complete process — from opening the app to installing it on your home screen for instant daily access.
 
 ## Steps to Get Up and Running
 
@@ -12,10 +12,10 @@ In just a few taps you can open Zmanim Today in your browser, grant location acc
   <Step title="Open the app in your browser">
     Navigate to the Zmanim Today URL in any modern browser. The app works on **iOS Safari**, **Android Chrome**, **Firefox**, and all major desktop browsers. No special plugins or extensions are required — the app loads entirely in the browser tab.
   </Step>
-  <Step title="Allow location access">
-    As soon as the app loads it will request your location via a standard browser permission prompt. Tap or click **Allow** to let Zmanim Today read your GPS coordinates.
+  <Step title="Set your location">
+    The Home screen opens without asking for anything up front. To load zmanim, tap **Use My Location** — this triggers the browser's location permission prompt. Tap or click **Allow** to let Zmanim Today read your GPS coordinates.
 
-    Your location is used solely to calculate accurate halachic times for your position — it is passed directly to the Hebcal API over a secure HTTPS connection and is never stored on any server. If you prefer not to share your GPS position you can skip this step and [search by city name](#searching-by-city) instead.
+    Your location is used solely to calculate accurate halachic times for your position — it is passed directly to the Hebcal API over a secure HTTPS connection and is never stored on any Zmanim Today server. If you prefer not to share your GPS position, tap the search icon and type a city name instead ([search by city](#searching-by-city)).
   </Step>
   <Step title="View your zmanim dashboard">
     Once your location is confirmed, your personalised dashboard appears instantly. You will see:
@@ -24,7 +24,7 @@ In just a few taps you can open Zmanim Today in your browser, grant location acc
     - **Zmanim list** — a scrollable summary of every enabled halachic time-point for today, showing the time in your local timezone.
     - **Mini Compass widget** — a compact animated compass pointing toward Jerusalem, showing the bearing in degrees and your distance to the city.
 
-    Tap any zman row to see a short description of what it means. Use the **Settings** gear icon to reorder items, hide zmanim you don't need, or switch to 24-hour time.
+    Tap the **Settings** gear icon in the top-right corner of the Home screen to reorder items, hide zmanim you don't need, or switch to 24-hour time.
   </Step>
   <Step title="(Optional) Install as a PWA">
     For the best mobile experience, install Zmanim Today as a Progressive Web App so it lives on your home screen like a native app — with a full-screen layout, faster load times, and support for push notification reminders.
@@ -57,14 +57,14 @@ In just a few taps you can open Zmanim Today in your browser, grant location acc
     Android supports PWA installation from **Chrome**, **Edge**, and most Chromium-based browsers.
 
     **Chrome (recommended):**
+
     1. Open Zmanim Today in **Chrome**.
     2. Tap the **three-dot menu** (⋮) in the top-right corner of the browser.
     3. Tap **Add to Home screen** (or **Install App** if Chrome detects the PWA manifest automatically and shows a banner).
     4. Confirm by tapping **Add** in the dialogue that appears.
     5. The app icon will appear on your home screen and in your app drawer.
 
-    **Install banner shortcut:**
-    Chrome may proactively show an **"Add Zmanim Today to Home screen"** banner at the bottom of the screen on your first visit. Tap **Install** on the banner to skip the menu steps above.
+    **Install banner shortcut:** Chrome may proactively show an **"Add Zmanim Today to Home screen"** banner at the bottom of the screen on your first visit. Tap **Install** on the banner to skip the menu steps above.
   </Tab>
 </Tabs>
 
@@ -72,6 +72,6 @@ In just a few taps you can open Zmanim Today in your browser, grant location acc
 
 If you decline the browser location prompt — or if you are planning ahead for travel — you can set your location by typing a city name instead of using GPS.
 
-On the home screen, tap the **Search** icon (magnifying glass) next to the location row, or tap the **Use My Location** button area to reveal the search field. Type any city, address, or place name — for example `Jerusalem`, `New York, NY`, or `London` — and tap the search button. Zmanim Today will resolve the place name to coordinates and calculate your prayer times for that location.
+On the Home screen, tap the **Search** icon (magnifying glass) next to the **Use My Location** button. A search field slides in. Type any city or place name — for example `Jerusalem`, `New York, NY`, or `London` — and tap the search button. Zmanim Today resolves the place name to coordinates via the Open-Meteo geocoding API and calculates your prayer times for that location.
 
-Your searched location is saved locally on your device so it persists between sessions. You can clear or change it at any time from the **Settings** screen or by tapping **Change** next to the location label on the home screen.
+Your searched location is saved locally on your device so it persists between sessions. You can clear it from the **Settings** screen (tap the gear icon on the Home header) or change it directly by tapping **Change** next to the location label on the Home screen.

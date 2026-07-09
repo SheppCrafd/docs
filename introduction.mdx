@@ -1,14 +1,14 @@
 ---
 title: "Zmanim Today — Your Personal Jewish Prayer Toolkit"
 sidebarTitle: "Introduction"
-description: "Zmanim Today delivers accurate halachic prayer times, a Jerusalem compass, and three built-in siddurim based on your exact GPS location."
+description: "Your personal Jewish prayer toolkit, with Zmanim and compass to Jerusalem being calculated accurately based on your current location."
 ---
 
-Your personal Jewish prayer toolkit, Zmanim and compass to Jerusalem calculated accurately based on your current location. Zmanim Today is a free, browser-based Progressive Web App that puts everything you need for daily Jewish prayer — precise halachic times, a live direction-finding compass, and three complete digital siddurim — right in your pocket, with no account or sign-up required.
+Zmanim Today is a browser-based Progressive Web App that puts everything you need for daily Jewish prayer — precise halachic times, a live direction-finding compass, and three complete digital siddurim — right in your pocket.
 
 ## What Are Zmanim?
 
-*Zmanim* (זמנים, literally "times") are the halachic time-points that govern the Jewish prayer schedule throughout the day. Because they are derived from sunrise, sunset, and the length of the solar day — not a fixed clock — they shift every day and differ significantly depending on your geographic location. Classic authorities such as the Vilna Gaon (GRA) and Rabbi Avraham Gombiner (Magen Avraham / MG"A) each define these intervals slightly differently, which is why you will often see two values shown for the same prayer window.
+_Zmanim_ (זמנים, literally "times") are the halachic time-points that govern the Jewish prayer schedule throughout the day. Because they are derived from sunrise, sunset, and the length of the solar day — not a fixed clock — they shift every day and differ significantly depending on your geographic location. Classic authorities such as the Vilna Gaon (GRA) and Rabbi Avraham Gombiner (Magen Avraham / MG"A) each define these intervals slightly differently, which is why you will often see two values shown for the same prayer window.
 
 Key zmanim include **Alot HaShachar** (dawn), **Netz HaChama** (sunrise), **Sof Zman Shma** (the latest time to recite the Shema), **Chatzot** (halachic midday), **Mincha Gedola**, **Plag HaMincha**, **Shkiat HaChama** (sunset), and **Tzait HaKochavim** (nightfall). Zmanim Today calculates all of these — and more — for your precise coordinates, refreshed automatically each day.
 
@@ -18,18 +18,23 @@ Key zmanim include **Alot HaShachar** (dawn), **Netz HaChama** (sunrise), **Sof 
   <Card title="Accurate Zmanim" icon="clock" href="/features/zmanim">
     Full daily schedule of halachic times calculated from your exact GPS coordinates via the Hebcal API, updated every day. Supports both GRA and MG"A opinions and optional 24-hour display.
   </Card>
+
   <Card title="Jerusalem Compass" icon="compass" href="/features/compass">
     An animated live compass that calculates the precise bearing and distance to Jerusalem from wherever you are in the world, using your device's GPS and orientation sensor.
   </Card>
+
   <Card title="Built-in Siddurim" icon="book-open" href="/features/siddur">
     Three complete prayer books sourced from the Sefaria library: the Sephardic Siddur (Edot HaMizrach), Ashkenazi Siddur, and the Weekday Chabad Siddur — with Hebrew text and navigable table of contents.
   </Card>
+
   <Card title="Push Reminders" icon="bell" href="/features/reminders">
     Set push-notification reminders for any zman so you never miss an important prayer window. Reminders fire even when the app is running in the background.
   </Card>
+
   <Card title="Customisable Dashboard" icon="sliders" href="/settings/dashboard">
     Choose which zmanim appear on your home screen, re-order them by drag-and-drop, and toggle between 12-hour and 24-hour time formats. Dark mode is fully supported.
   </Card>
+
   <Card title="PWA — Install on Any Device" icon="mobile" href="/getting-started">
     Zmanim Today is a Progressive Web App. Install it on your iOS or Android home screen — or as a desktop app — for an offline-ready, full-screen experience without any app store download.
   </Card>
@@ -37,21 +42,21 @@ Key zmanim include **Alot HaShachar** (dawn), **Netz HaChama** (sunrise), **Sof 
 
 ## How It Works
 
-- **Grant location access** — when you first open the app your browser asks for permission to read your GPS coordinates. Tap **Allow** to enable automatic location detection, or type a city name to set your location manually.
-- **Times are calculated** — your latitude, longitude, and local timezone are sent to the Hebcal API, which returns every halachic time-point for the current date.
-- **Your dashboard loads** — the home screen displays a live countdown to the next upcoming zman, a sortable list of today's prayer times, a mini Jerusalem compass, and quick-launch buttons for the siddurim.
+- **Set your location** — on first open, the Home screen prompts you to tap **Use My Location** (which asks the browser for GPS permission) or to search for a city by name. Your coordinates and timezone are saved locally so the app remembers them next time.
+- **Times are calculated** — your latitude, longitude, and local timezone are sent to the Hebcal API, which returns every halachic time-point for the current date. Responses are memoised in `sessionStorage` so subsequent views load instantly.
+- **Your dashboard loads** — the home screen displays a live countdown to the next upcoming zman, a customisable list of today's prayer times, a mini Jerusalem compass, and print buttons for today's and tomorrow's zmanim.
 - **Install as an app** — use your browser's "Add to Home Screen" (iOS) or "Install App" (Android / desktop) option to pin Zmanim Today to your device for instant one-tap access, just like a native app.
 
 <Note>
-  Zmanim Today uses your GPS data exclusively on-device to calculate prayer times. Your coordinates are passed directly to the Hebcal public API over HTTPS and are never stored, logged, or shared with any external server by the app itself.
+  Zmanim Today calculates prayer times entirely in the browser. Your coordinates are passed directly to the Hebcal, BigDataCloud, TimeAPI, and Open-Meteo public APIs over HTTPS as needed, and are never logged, stored, or shared by a Zmanim Today server — the app has none of its own.
 </Note>
 
 ## Data Sources
 
 ### Hebcal API
 
-The [Hebcal Zmanim API](https://www.hebcal.com/home/197/jewish-calendar-rest-api) is a free, open-source Jewish calendar service that computes halachic times from latitude, longitude, and timezone inputs. Zmanim Today calls the Hebcal `/zmanim` endpoint directly from your browser each time it needs to refresh prayer times. The API returns times for all major zmanim in both GRA and MG"A opinions, plus special values such as candle-lighting and Havdalah on the relevant days of the week.
+The [Hebcal Zmanim API](https://www.hebcal.com/home/197/jewish-calendar-rest-api) is a free, open-source Jewish calendar service that computes halachic times from latitude, longitude, and timezone inputs. Zmanim Today calls the Hebcal `/zmanim` endpoint directly from your browser when it needs times for a new location or date, and caches responses in `sessionStorage` for the rest of the tab's lifetime. The Hebcal `/converter` endpoint is also called to render the Hebrew date and parsha. The API returns times for all major zmanim in both GRA and MG"A opinions, plus special values such as candle-lighting and Havdalah on the relevant days of the week.
 
 ### Sefaria API
 
-The [Sefaria API](https://www.sefaria.org/developers) provides free, open access to the full corpus of Jewish texts. Zmanim Today uses Sefaria to fetch and display three complete siddurim — *Siddur Edot HaMizrach*, *Siddur Ashkenaz*, and *Weekday Siddur Chabad* — including their Hebrew text, section structure, and table-of-contents metadata. Text is fetched and cached locally inside the app for fast, offline-friendly reading.
+The [Sefaria API](https://www.sefaria.org/developers) provides free, open access to the full corpus of Jewish texts. Zmanim Today uses Sefaria to fetch and display three complete siddurim — _Siddur Edot HaMizrach_, _Siddur Ashkenaz_, and _Weekday Siddur Chabad_ — including their Hebrew text, section structure, and table-of-contents metadata. Text is fetched and cached locally inside the app for fast, offline-friendly reading.
