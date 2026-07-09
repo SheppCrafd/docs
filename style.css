@@ -1,9 +1,48 @@
-/* Hide all Mintlify AI assistant UI (not available on Hobby plan) */
+/* Nuke all Mintlify AI assistant UI */
+
+/* Navbar star / assistant entry button (desktop + mobile) */
 #assistant-entry,
 #assistant-entry-mobile,
+[data-component-name="primary-header-button"],
+button[aria-label*="assistant" i],
+button[aria-label*="Ask AI" i],
+a[aria-label*="assistant" i] {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* Assistant side panel / sheet */
 #chat-assistant-sheet,
 chat-assistant-sheet,
+chat-assistant-sheet-header,
+chat-assistant-sheet-content,
+chat-assistant-input,
+chat-assistant-send-button,
+chat-assistant-disclaimer-text,
+chat-assistant-payload-item,
+starter-question-text,
+[data-component-part^="contact-support"] {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* Floating "Ask a question" bar at the bottom of the page */
 chat-assistant-floating-input,
-[data-component-name="primary-header-button"] {
+#chat-assistant-textarea,
+[class*="chat-assistant-floating"],
+[class*="AssistantFloating"],
+[class*="assistant-floating"] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  height: 0 !important;
+  width: 0 !important;
+}
+
+/* Code-block "Ask assistant" button */
+#ask-assistant-code-block-button {
   display: none !important;
 }
