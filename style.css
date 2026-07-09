@@ -12,7 +12,7 @@ a[aria-label*="assistant" i] {
   pointer-events: none !important;
 }
 
-/* Assistant side panel / sheet */
+/* Assistant side panel / sheet + any overlay/backdrop it renders */
 #chat-assistant-sheet,
 chat-assistant-sheet,
 chat-assistant-sheet-header,
@@ -22,10 +22,27 @@ chat-assistant-send-button,
 chat-assistant-disclaimer-text,
 chat-assistant-payload-item,
 starter-question-text,
-[data-component-part^="contact-support"] {
+[id^="chat-assistant"],
+[class*="chat-assistant"],
+[class*="ChatAssistant"],
+[class*="AssistantSheet"],
+[class*="assistant-sheet"],
+[data-component-name*="assistant" i],
+[data-component-part^="contact-support"],
+[role="dialog"][aria-label*="assistant" i],
+[role="dialog"][aria-label*="Ask AI" i] {
   display: none !important;
   visibility: hidden !important;
   pointer-events: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  opacity: 0 !important;
+}
+
+/* Force body scroll back on in case the sheet locked it */
+html,
+body {
+  overflow: auto !important;
 }
 
 /* Floating "Ask a question" bar at the bottom of the page */
