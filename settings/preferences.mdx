@@ -1,0 +1,75 @@
+---
+title: "App Preferences: Theme, Time Format, and More"
+sidebarTitle: "Preferences"
+description: "Configure Zmanim Today's appearance and time display — toggle dark mode, switch between 12-hour and 24-hour formats, and access your saved siddurim."
+---
+
+The Settings page gives you direct control over how Zmanim Today looks and how it displays times. Preferences are saved to your browser's local storage and applied instantly across every part of the app — no page reload required.
+
+## Dark Mode
+
+The **Dark Mode** toggle is found in the **Appearance** section of Settings, identified by a moon icon (🌙) and the subtitle *"Easy on the eyes for night prayer."*
+
+Tapping the toggle switches the entire app to a dark colour scheme:
+
+- The home dashboard, zmanim list, and all navigation elements switch to dark backgrounds with light text.
+- The **Siddur reader** also respects the dark mode setting, making late-night Maariv and Shabbat reading comfortable in low-light conditions.
+- Your preference is remembered every time you open the app.
+
+Dark mode is disabled by default.
+
+## Time Format
+
+The **Time Format** section contains a single toggle: **24-Hour Time**, described as *"Show times in 24h format (e.g. 18:30)."*
+
+| Toggle state | Example display |
+|---|---|
+| Off (default) | 6:30 PM |
+| On | 18:30 |
+
+The 24-hour format applies everywhere times are displayed in the app:
+
+- **Home dashboard** — all zman cards and the Next Zman Countdown widget.
+- **Full Zmanim page** — the complete daily zmanim table.
+
+<Tip>
+  The 24-hour format is especially useful when printing or sharing a zmanim schedule with people across different countries or time zones, where AM/PM conventions may be unfamiliar. It also removes any ambiguity around midnight zmanim such as Chatzot Laila.
+</Tip>
+
+## Siddur Shortcuts
+
+The **Siddurim** section at the bottom of Settings provides quick-access links to all three built-in prayer books. Tap any row to open the corresponding siddur reader:
+
+<CardGroup cols={3}>
+  <Card title="📖 Sephardic Siddur" icon="book-open">
+    Nusach Edot HaMizrach — the traditional Sephardic rite.
+  </Card>
+  <Card title="📖 Ashkenazi Siddur" icon="book-open">
+    Nusach Ashkenaz — the traditional Ashkenazi rite.
+  </Card>
+  <Card title="📖 Chabad Siddur" icon="book-open">
+    Nusach Ari — the Chabad-Lubavitch rite.
+  </Card>
+</CardGroup>
+
+Each siddur opens in the full-screen reader with its own table of contents. The siddurim are also accessible directly from the bottom navigation bar.
+
+## Resetting Preferences
+
+Zmanim Today does not have a dedicated "Reset all" button. All preferences — theme, time format, and dashboard layout — are stored in your browser's local storage. To restore the factory defaults:
+
+<Steps>
+  <Step title="Open your browser settings">
+    In Chrome, Firefox, or Safari, navigate to **Settings → Privacy → Clear browsing data** (or equivalent).
+  </Step>
+  <Step title="Clear site data for Zmanim Today">
+    Select **Cookies and site data** (or **Local storage**) and clear it for the Zmanim Today domain.
+  </Step>
+  <Step title="Reload the app">
+    Refresh the page. The app will start fresh with all defaults: light mode, 12-hour time, and the default dashboard item selection.
+  </Step>
+</Steps>
+
+<Note>
+  Clearing browser data will also remove your saved location. You will need to re-enter your city or re-approve the GPS permission when the app next loads.
+</Note>

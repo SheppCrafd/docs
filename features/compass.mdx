@@ -1,0 +1,75 @@
+---
+title: "Jerusalem Compass: Find the Right Direction to Pray"
+sidebarTitle: "Compass"
+description: "The live Jerusalem compass in Zmanim Today uses your device's orientation sensor to show the exact direction of Jerusalem from anywhere in the world."
+---
+
+Jewish prayer is traditionally directed toward Jerusalem — specifically toward the Temple Mount (Har HaBayit). This direction is called **mizrach** (מזרח, "east") in Ashkenazi tradition, though the precise bearing depends entirely on where in the world you are standing. Someone in New York faces northeast, while someone in Mumbai faces west. Zmanim Today's built-in compass takes the guesswork out of *kavanah* (intentional direction) by computing the great-circle bearing from your GPS coordinates to Jerusalem (31.778°N, 35.235°E) and overlaying it on a live, sensor-driven compass rose.
+
+---
+
+## Reading the Compass
+
+The Compass page centers on an animated **SVG compass rose** that fills most of the screen:
+
+- **Rotating ring** — the outer ring displays cardinal labels (N, E, S, W) and degree tick marks. As you physically rotate your device, this ring rotates in the opposite direction so that North always points to true north relative to the world.
+- **Golden arrow** — a fixed amber/gold chevron arrow points toward Jerusalem. As you turn, the arrow adjusts so it always indicates the real-world direction of Jerusalem regardless of which way you are facing.
+- **"Jerusalem" label** — rendered in amber at the arrowhead so the target is immediately clear.
+- **Center dot** — a filled amber dot at the compass center acts as the pivot point.
+
+Below the compass rose, three information cards display:
+
+| Card | Value |
+|------|-------|
+| **Heading** | Your device's current compass heading in degrees (updates in real time) |
+| **Bearing** | The fixed great-circle bearing from your location to Jerusalem in degrees |
+| **Distance** | Straight-line distance to Jerusalem in miles or km |
+
+A summary sentence reads, for example: *"Jerusalem is 5,732 miles away at a bearing of 58°."*
+
+---
+
+## Enabling the Sensor
+
+<Steps>
+  <Step title="Open the Compass page">
+    Tap **Compass** in the bottom navigation bar (or the nav menu). The compass rose appears immediately with the golden arrow calculated from your saved location.
+  </Step>
+  <Step title="Allow motion sensor access (iOS)">
+    On iOS, the first time you open the Compass page a browser prompt asks: *"Allow [site] to access motion and orientation?"* Tap **Allow** to enable real-time rotation. If you miss the prompt, tap the **Enable Compass Sensor** button that appears below the compass rose.
+  </Step>
+  <Step title="Turn your device to see the ring rotate">
+    Once permission is granted, the compass ring rotates smoothly in real time as you physically turn. The golden arrow stays locked to the correct Jerusalem bearing. Face the direction the arrow points — that is qibla/mizrach for your current location.
+  </Step>
+</Steps>
+
+---
+
+## Manual Mode
+
+If the orientation sensor is unavailable (for example, on a desktop browser or when permission is denied), the compass ring does not rotate automatically. Instead, a **manual heading slider** appears beneath the compass:
+
+- Drag the slider left or right to set your heading manually (0°–359°).
+- The current heading value is displayed below the slider in degrees.
+- The golden Jerusalem arrow recalculates in real time as you drag, so you can still find the correct direction by matching the slider to a physical compass or a known landmark.
+
+---
+
+## Distance Display
+
+The app calculates the great-circle distance between your GPS coordinates and the Jerusalem Temple Mount. The unit displayed switches automatically based on your device's language setting:
+
+- **Imperial** — miles, shown when your device is set to an English language.
+- **Metric** — kilometres, shown for all other language settings.
+
+The distance is for informational context only; it does not affect the bearing calculation.
+
+---
+
+<Note>
+**iOS permission prompt:** On iOS (Safari and Safari-based browsers), the motion sensor permission dialog appears the **first time you open the Compass page** each session, not at app install or launch. If you previously denied the permission, you can re-enable it in **iOS Settings → Safari → Motion & Orientation Access**.
+</Note>
+
+<Tip>
+Don't need the full Compass page? The **MiniCompass widget** on the Home dashboard shows a compact Jerusalem-direction indicator at a glance — a small rotating ring with the golden arrow — without leaving the home screen. You can enable or disable it in **Settings → Home Dashboard → Jerusalem Compass**.
+</Tip>

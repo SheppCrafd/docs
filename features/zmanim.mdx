@@ -1,0 +1,96 @@
+---
+title: "Daily Zmanim: Halachic Jewish Prayer Times by Location"
+sidebarTitle: "Zmanim"
+description: "Zmanim Today calculates all 17 daily halachic time-points from your GPS location, displaying a live countdown to the next upcoming zman."
+---
+
+Jewish law prescribes precise time-windows for prayer, Torah study, and religious observance. These time-windows — called **zmanim** (זמנים, "times") — are not fixed on the clock but shift every day based on the length of daylight at your exact latitude and longitude. Reciting Shema too late, praying Shacharit past its deadline, or lighting Shabbat candles after sunset are halachic concerns that affect Jewish communities worldwide. Zmanim Today removes that uncertainty by calculating every relevant time-point directly from your GPS coordinates using the authoritative [Hebcal API](https://www.hebcal.com/home/197/zmanim-halachic-times-api).
+
+---
+
+## Your Zmanim Dashboard
+
+The **Home** screen is your daily command center. As soon as the app detects your location it presents:
+
+- **Next Zman countdown card** — a prominent card at the top showing the name, Hebrew label, and a live ticking countdown (hours : minutes : seconds) to the very next upcoming zman. The card updates automatically as each zman passes.
+- **Zmanim summary list** — a scrollable list of today's highlighted times rendered as clean cards beneath the countdown. Each row shows the zman's emoji icon, English name, and formatted time. You can customize which zmanim appear here from the Settings page.
+- **MiniCompass widget** — a compact Jerusalem-direction indicator (see the [Compass](/features/compass) page) that sits above the zmanim list and can be toggled in Settings.
+- **Bell icon (Reminders)** — tap to open the Reminders panel and configure push-notification alerts for any zman.
+- **Print buttons** — one-tap buttons to generate a printable zmanim sheet for today or tomorrow.
+
+Tap **View full zmanim list** at the bottom of the home screen to open the dedicated Zmanim page, which displays all time-points grouped by part of the day.
+
+---
+
+## Complete List of Zmanim
+
+Zmanim Today tracks all 17 halachic time-points. Times are grouped into **Dawn & Morning**, **Midday & Afternoon**, and **Evening & Night**.
+
+| Zman | Hebrew | Description |
+|------|--------|-------------|
+| Alot HaShachar | עלות השחר | Dawn — first glimmer of light, 72 minutes before sunrise |
+| Misheyakir | משיכיר | Earliest time to wear tzitzit and put on tefillin |
+| Sunrise | הנץ החמה | Sun appears above the horizon (HaNetz HaChamah) |
+| Sof Zman Shema (GRA) | סוף זמן קריאת שמע | Latest time to recite Shema per the Vilna Gaon — 3 halachic hours after sunrise |
+| Sof Zman Shema (MGA) | סוף זמן קריאת שמע | Latest time to recite Shema per the Magen Avraham — 3 halachic hours after Alot HaShachar (more stringent) |
+| Sof Zman Tefillah (GRA) | סוף זמן תפילה | Latest Shacharit (Shemoneh Esrei) per the GRA — 4 halachic hours after sunrise |
+| Sof Zman Tefillah (MGA) | סוף זמן תפילה | Latest Shacharit per the Magen Avraham — 4 halachic hours after Alot HaShachar (more stringent) |
+| Chatzot | חצות | Halachic midday — the exact midpoint between sunrise and sunset |
+| Mincha Gedola | מנחה גדולה | Earliest time for Mincha — 30 minutes after Chatzot |
+| Mincha Ketana | מנחה קטנה | Preferred (ideal) time for Mincha — 2.5 halachic hours before sunset |
+| Plag HaMincha | פלג המנחה | 1.25 halachic hours before nightfall; also the earliest time candle lighting may be accepted |
+| Candle Lighting | הדלקת נרות | 18 minutes before sunset — Shabbat/Yom Tov candles *(Fridays only)* |
+| Sunset | שקיעה | Sun drops below the horizon (Shkiyat HaChamah) |
+| Tzeit HaKochavim | צאת הכוכבים | Nightfall — three medium stars become visible (calculated at 8.5° below horizon) |
+| Tzait (72 min) | צאת 72 דקות | Nightfall per Rabbeinu Tam — 72 minutes after sunset |
+| Havdalah | הבדלה | End of Shabbat, identical to Tzeit HaKochavim *(Saturdays only)* |
+| Chatzot Laila | חצות לילה | Halachic midnight — midpoint of the halachic night |
+
+---
+
+## Hebrew Date & Parsha
+
+At the top of the full Zmanim page, alongside the date picker, the app displays:
+
+- **Hebrew date** — shown in Hebrew script (right-to-left) with a transliterated version below, e.g. *כ״ה אייר תשפ״ה / 25 Iyyar 5785*.
+- **Day of the week** — in Hebrew with transliteration.
+- **Parsha** — the weekly Torah portion read on the upcoming Shabbat, shown in both Hebrew and English, e.g. *פרשת בְּחֻקֹּתַי / Parashat Bechukotai*.
+
+Hebrew calendar data is fetched from the Hebcal API alongside the zmanim calculation, so no extra request is needed.
+
+---
+
+## Browsing Other Dates
+
+The Zmanim page includes a full **date picker** that lets you look up halachic times for any date:
+
+- Tap the **left arrow (‹)** to go back one day; tap the **right arrow (›)** to advance one day.
+- Tap the **date button** in the center to open a calendar popover and jump to any date directly.
+- Tap **Today** to instantly return to the current date.
+- All times and the Hebrew date/Parsha display update automatically whenever the date changes.
+
+---
+
+## Time Format
+
+Zmanim Today supports both **12-hour (AM/PM)** and **24-hour** clock formats. Toggle between them in **Settings → Time Format → 24-Hour Time**. The preference is applied instantly across the home dashboard, the full Zmanim page, and printed sheets — no page reload required.
+
+---
+
+## Printing Zmanim
+
+A **print button** (🖨) appears on both the Home dashboard and the full Zmanim page whenever times have been calculated. Tapping it opens your browser's print dialog with a clean, formatted zmanim sheet that includes:
+
+- Location name and coordinates
+- Gregorian and Hebrew date
+- Parsha (when applicable)
+- All zmanim grouped by time of day, with emoji icons
+- Your chosen timezone
+
+You can print today's times directly from the Home dashboard, or navigate to any past or future date on the Zmanim page and print that date's sheet.
+
+---
+
+<Tip>
+**Shabbat-aware display:** Candle Lighting (🕯) appears only on **Fridays**, and Havdalah (🕍) appears only on **Saturdays**. On all other days these rows are hidden automatically, keeping the list clean and relevant.
+</Tip>

@@ -1,0 +1,439 @@
+---
+title: "How Zmanim Today Works — Technical Reference"
+sidebarTitle: "How It Works"
+description: "A page-by-page technical breakdown of how Zmanim Today calculates halachic times, resolves location, drives the Jerusalem compass, renders the siddur, and schedules push reminders."
+icon: "gears"
+---
+
+This page is a technical companion to the [feature guides](/features/zmanim). It walks through each screen in the app and explains, in plain terms, the data flow, calculations, and browser APIs behind it. All snippets are illustrative pseudocode — the shipped app may differ in exact naming, but the underlying mechanics are accurate.
+
+---
+
+## Architecture at a Glance
+
+Zmanim Today is a client-side **Progressive Web App (PWA)**. There is no user account and no server-side session — every screen is rendered from four inputs:
+
+1. Your **GPS coordinates** (from the browser Geolocation API or a city search).
+2. The **selected date** (defaults to today in your local timezone).
+3. Zmanim \+ Hebrew calendar data from the **Hebcal API**.
+4. Local **preferences** stored in `localStorage` (theme, time format, nusach, reminders, dashboard order).
+
+```text
+ ┌────────────────────────────────┐   coords + date    ┌──────────────────────────────────┐
+ │         Browser APIs        │────────────────────▶│          Hebcal API           │
+ │         Geolocation /       │                    │      /zmanim, /hebcal         │
+ │         DeviceOrient.       │◀────────────────────│       (JSON responses)        │
+ └────────────────────────────────┘    times + parsha  └──────────────────────────────────┘
+                 │                        │
+                 ▼                        ▼
+ ┌──────────────────────────────────────────────────────────────────────────────────────────────┐
+ │                             React UI (rendered per page)                            │
+ │                    Home · Zmanim · Compass · Siddur · Settings                      │
+ └──────────────────────────────────────────────────────────────────────────────────────────────┘
+                 │
+                 ▼
+ ┌────────────────────────────────┐
+ │         localStorage        │  ← preferences, reminders, cached location
+ └────────────────────────────────┘
+```
+
+---
+
+## Home Dashboard
+
+The Home screen ([user guide](/features/zmanim)) is the app's default route. It composes four widgets: the **Next Zman countdown**, a **zmanim summary list**, the optional **MiniCompass**, and a **reminders bell**.
+
+### Data fetch
+
+On mount, the page reads the saved location and issues a single request to Hebcal for today's zmanim:
+
+```js
+const { lat, lon, tzid } = getSavedLocation();
+const today = new Date().toISOString().slice(0, 10); // YYYY-MM-DD
+
+const zmanim = await fetch(
+  `https://www.hebcal.com/zmanim?cfg=json&latitude=${lat}` +
+  `&longitude=${lon}&tzid=${tzid}&date=${today}`
+).then(r => r.json());
+```
+
+The response contains ISO-8601 timestamps for every halachic time-point:
+
+```json
+{
+  "times": {
+    "alotHaShachar":     "2026-07-09T03:41:00-04:00",
+    "sunrise":           "2026-07-09T05:31:00-04:00",
+    "sofZmanShmaGRA":    "2026-07-09T09:14:00-04:00",
+    "chatzot":           "2026-07-09T13:00:00-04:00",
+    "minchaKetana":      "2026-07-09T17:35:00-04:00",
+    "sunset":            "2026-07-09T20:29:00-04:00",
+    "tzeit85degrees":    "2026-07-09T21:11:00-04:00"
+  }
+}
+```
+
+### Next-Zman countdown
+
+The countdown card picks the first zman whose timestamp is still in the future, then ticks every second:
+
+```js
+function pickNextZman(times, now = Date.now()) {
+  return Object.entries(times)
+    .map(([key, iso]) => ({ key, ts: Date.parse(iso) }))
+    .filter(z => z.ts > now)
+    .sort((a, b) => a.ts - b.ts)[0];
+}
+
+setInterval(() => {
+  const next = pickNextZman(times);
+  const diff = next.ts - Date.now();
+  render(formatHMS(diff)); // "02:47:13"
+}, 1000);
+```
+
+When `diff` reaches zero the effect re-runs `pickNextZman` and the card automatically advances to the next time-point.
+
+### Shabbat-aware rows
+
+Candle Lighting and Havdalah are conditionally rendered based on the local day of the week:
+
+```js
+const dow = new Date().getDay(); // 0 = Sunday … 6 = Saturday
+const showCandles  = dow === 5; // Friday
+const showHavdalah = dow === 6; // Saturday
+```
+
+---
+
+## Zmanim Page
+
+The full [Zmanim page](/features/zmanim) mirrors the Home fetch but adds a date picker, Hebrew calendar data, and grouped rendering.
+
+### Hebrew date \+ Parsha
+
+A second Hebcal endpoint returns the Hebrew date and the upcoming Torah portion:
+
+```js
+const hebcal = await fetch(
+  `https://www.hebcal.com/hebcal?cfg=json&v=1&maj=on&s=on` +
+  `&start=${date}&end=${date}&latitude=${lat}&longitude=${lon}`
+).then(r => r.json());
+
+const hebrewDate = hebcal.items.find(i => i.category === "hebdate");
+const parsha     = hebcal.items.find(i => i.category === "parashat");
+```
+
+### Date picker
+
+The left/right arrows shift the selected date by exactly one day; "Today" resets to the local date. Any change triggers a fresh fetch:
+
+```js
+function shiftDate(delta) {
+  const d = new Date(selectedDate);
+  d.setDate(d.getDate() + delta);
+  setSelectedDate(d.toISOString().slice(0, 10));
+}
+```
+
+### Grouping
+
+Before rendering, zmanim are bucketed by time of day:
+
+```js
+const groups = {
+  "Dawn & Morning":    ["alotHaShachar", "misheyakir", "sunrise",
+                        "sofZmanShmaGRA", "sofZmanTfillaGRA"],
+  "Midday & Afternoon":["chatzot", "minchaGedola", "minchaKetana",
+                        "plagHaMincha"],
+  "Evening & Night":   ["candleLighting", "sunset", "tzeit85degrees",
+                        "tzeit72min", "havdalah", "chatzotNight"]
+};
+```
+
+---
+
+## Compass Page
+
+The [Compass page](/features/compass) combines a **great-circle bearing** calculation with the browser's `DeviceOrientationEvent` to keep the golden arrow locked on Jerusalem.
+
+### Bearing to Jerusalem
+
+Given your latitude/longitude and Jerusalem (31.778°N, 35.235°E), the initial bearing is computed with the standard forward-azimuth formula:
+
+```js
+const JERUSALEM = { lat: 31.778, lon: 35.235 };
+
+function bearingTo(from, to) {
+  const φ1 = toRad(from.lat), φ2 = toRad(to.lat);
+  const Δλ = toRad(to.lon - from.lon);
+
+  const y = Math.sin(Δλ) * Math.cos(φ2);
+  const x = Math.cos(φ1) * Math.sin(φ2) -
+            Math.sin(φ1) * Math.cos(φ2) * Math.cos(Δλ);
+
+  return (toDeg(Math.atan2(y, x)) + 360) % 360; // 0–359.99°
+}
+```
+
+### Great-circle distance (Haversine)
+
+```js
+function distanceKm(from, to) {
+  const R = 6371; // Earth radius, km
+  const dLat = toRad(to.lat - from.lat);
+  const dLon = toRad(to.lon - from.lon);
+  const a = Math.sin(dLat / 2) ** 2 +
+            Math.cos(toRad(from.lat)) * Math.cos(toRad(to.lat)) *
+            Math.sin(dLon / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(a));
+}
+```
+
+The unit label switches based on `navigator.language`:
+
+```js
+const useMiles = navigator.language.startsWith("en");
+const display = useMiles ? `${(km * 0.621371).toFixed(0)} mi`
+                         : `${km.toFixed(0)} km`;
+```
+
+### Live heading
+
+On Android and desktop Chrome/Firefox, `deviceorientationabsolute` provides a true-north heading directly:
+
+```js
+window.addEventListener("deviceorientationabsolute", (e) => {
+  const heading = 360 - e.alpha; // rotate ring opposite to device
+  setHeading(heading);
+});
+```
+
+On iOS, permission must first be requested from a user gesture, and the heading comes from `webkitCompassHeading`:
+
+```js
+async function enableCompass() {
+  if (typeof DeviceOrientationEvent.requestPermission === "function") {
+    const state = await DeviceOrientationEvent.requestPermission();
+    if (state !== "granted") return showManualSlider();
+  }
+  window.addEventListener("deviceorientation", (e) => {
+    if (e.webkitCompassHeading != null) setHeading(e.webkitCompassHeading);
+  });
+}
+```
+
+If no sensor is available (desktop, denied permission), the app falls back to a manual slider that drives the same `heading` state.
+
+### Rendering
+
+The compass rose is a single SVG. The ring counter-rotates by `heading`, while the golden arrow rotates to `bearing`:
+
+```jsx
+<svg viewBox="0 0 200 200">
+  <g transform={`rotate(${-heading} 100 100)`}>{/* N/E/S/W ring */}</g>
+  <g transform={`rotate(${bearing - heading} 100 100)`}>
+    <path d="M100,20 L110,50 L100,45 L90,50 Z" fill="#f59e0b" />
+    <text y="12" textAnchor="middle" fill="#f59e0b">Jerusalem</text>
+  </g>
+</svg>
+```
+
+---
+
+## Siddur Page
+
+The [Siddur](/features/siddur) ships three prayer books — Sephardic, Ashkenazi, and Chabad — as static JSON documents bundled with the app. No network request is made once the app has loaded.
+
+### Content shape
+
+```json
+{
+  "nusach": "ashkenaz",
+  "sections": [
+    {
+      "id": "shacharit",
+      "title": { "he": "שחרית", "en": "Shacharit" },
+      "prayers": [
+        {
+          "id": "modeh-ani",
+          "title": { "he": "מודה אני", "en": "Modeh Ani" },
+          "lines": [
+            { "he": "מוֹדֶה אֲנִי לְפָנֶיךָ…", "en": "I give thanks…" }
+          ]
+        }
+      ]
+    }
+  ]
+}
+```
+
+### Reading mode
+
+A single state flag drives which columns are rendered:
+
+```jsx
+function Line({ he, en, mode }) {
+  return (
+    <div className="prayer-line">
+      {mode !== "english" && <p dir="rtl" className="he">{he}</p>}
+      {mode !== "hebrew"  && <p dir="ltr" className="en">{en}</p>}
+    </div>
+  );
+}
+```
+
+The user's last-chosen nusach and reading mode are persisted:
+
+```js
+localStorage.setItem("siddur.nusach", "ashkenaz");
+localStorage.setItem("siddur.mode", "bilingual");
+```
+
+---
+
+## Reminders
+
+The [Reminders](/features/reminders) panel schedules browser push notifications for any of the daily zmanim.
+
+### Permission \+ subscription
+
+```js
+async function enableReminders() {
+  const perm = await Notification.requestPermission();
+  if (perm !== "granted") return;
+
+  const reg = await navigator.serviceWorker.ready;
+  await reg.pushManager.subscribe({ userVisibleOnly: true });
+}
+```
+
+### Scheduling
+
+Each reminder is a small object stored in `localStorage`:
+
+```json
+{
+  "id": "shema-gra",
+  "zman": "sofZmanShmaGRA",
+  "minutesBefore": 15,
+  "enabled": true
+}
+```
+
+On app load, and after any zmanim refetch, the service worker rebuilds its timer list:
+
+```js
+for (const r of reminders.filter(r => r.enabled)) {
+  const fireAt = Date.parse(times[r.zman]) - r.minutesBefore * 60_000;
+  const delay  = fireAt - Date.now();
+  if (delay > 0) setTimeout(() => showNotification(r), delay);
+}
+```
+
+When the timer fires, the service worker calls `showNotification` with the zman's name, Hebrew label, and the exact time it will occur.
+
+---
+
+## Location Settings
+
+The [Location page](/settings/location) is the single source of truth for `lat`, `lon`, and `tzid`. Two resolution paths feed the same saved shape:
+
+### GPS
+
+```js
+navigator.geolocation.getCurrentPosition(
+  (pos) => saveLocation({
+    lat:  pos.coords.latitude,
+    lon:  pos.coords.longitude,
+    tzid: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    label: "Current location"
+  }),
+  (err) => showError(err)
+);
+```
+
+### City search
+
+City queries are resolved via a geocoding lookup (Hebcal's city index or an equivalent service) and stored in the same format:
+
+```json
+{
+  "lat":  40.7128,
+  "lon": -74.0060,
+  "tzid": "America/New_York",
+  "label": "New York, NY"
+}
+```
+
+Every other page reads this object with `getSavedLocation()`. Clearing the location wipes the key and returns the user to the onboarding prompt.
+
+---
+
+## Dashboard Customizer
+
+The [Dashboard settings page](/settings/dashboard) stores a single ordered array of widget IDs:
+
+```json
+{
+  "order": [
+    "next-zman", "mini-compass", "sunrise", "sofZmanShmaGRA",
+    "chatzot", "minchaKetana", "sunset", "tzeit85degrees"
+  ],
+  "hidden": ["tzeit72min", "chatzotNight"]
+}
+```
+
+Drag-and-drop uses the HTML5 drag API; on drop the array is reordered and written back:
+
+```js
+function onDrop(fromIdx, toIdx) {
+  const next = [...order];
+  const [moved] = next.splice(fromIdx, 1);
+  next.splice(toIdx, 0, moved);
+  savePrefs({ order: next });
+}
+```
+
+The Home dashboard renders strictly from `order`, filtering out anything in `hidden`.
+
+---
+
+## Preferences
+
+The [Preferences page](/settings/preferences) is a thin UI over three `localStorage` keys:
+
+```js
+localStorage.setItem("pref.theme",       "dark");      // "light" | "dark"
+localStorage.setItem("pref.timeFormat",  "24h");       // "12h"  | "24h"
+localStorage.setItem("pref.language",    "en");        // ISO code
+```
+
+Theme changes toggle a class on `<html>` so Tailwind's dark variants take over instantly:
+
+```js
+document.documentElement.classList.toggle("dark", theme === "dark");
+```
+
+Time format is applied in a single formatter used everywhere times are rendered:
+
+```js
+function formatZman(iso, format) {
+  const d = new Date(iso);
+  return d.toLocaleTimeString([], {
+    hour:   "2-digit",
+    minute: "2-digit",
+    hour12: format === "12h"
+  });
+}
+```
+
+---
+
+<Tip>
+  Because every screen is driven by the same four inputs — location, date, Hebcal data, and local preferences — the app works fully offline once loaded (except for date changes that require a fresh Hebcal fetch). The service worker caches both the app shell and recent zmanim responses.
+</Tip>
+
+<Note>
+  This page describes the app's runtime behavior. For end-user instructions, see the [Features](/features/zmanim) and [Settings](/settings/location) guides.
+</Note>

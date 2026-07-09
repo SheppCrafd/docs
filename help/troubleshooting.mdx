@@ -1,0 +1,91 @@
+---
+title: "Troubleshooting Common Issues in Zmanim Today"
+sidebarTitle: "Troubleshooting"
+description: "Fix common problems with Zmanim Today — location not detected, compass not working, notifications not showing, and siddur content not loading."
+---
+
+If something isn't working as expected, the steps below cover the most common issues reported by Zmanim Today users. Work through the relevant section and try each step in order before moving to the next.
+
+## Location Issues
+
+<AccordionGroup>
+  <Accordion title="My location isn't being detected">
+    1. **Check browser location permission** — Open your browser or device settings and confirm that location access for Zmanim Today is set to **Allow**. On iOS, go to Settings → Safari → Location. On Android, go to Settings → Apps → Chrome → Permissions → Location.
+    2. **Use city search as a workaround** — If GPS continues to fail, tap the search field in Location settings, type your city name, and select the correct result. This bypasses GPS entirely.
+    3. **Reload the page** — A fresh page load re-triggers the geolocation request. Try refreshing and tapping **Allow** when the permission prompt appears.
+    4. **Ensure the device has a GPS signal** — Move to an area with a clear view of the sky or near a window. Indoor GPS signals can be weak or unavailable.
+  </Accordion>
+
+  <Accordion title="My times look wrong for my city">
+    1. **Verify the saved location in Settings** — Open the Settings page and confirm that the displayed city or coordinates match your actual location.
+    2. **Clear location and re-enter** — Tap the clear/reset option next to your saved location, then re-enter your city or re-grant GPS access to get a fresh reading.
+    3. **Double-check the city spelling in the search** — Search results are matched by name; try alternate spellings or search for a nearby major city if yours does not appear.
+  </Accordion>
+</AccordionGroup>
+
+## Compass Issues
+
+<AccordionGroup>
+  <Accordion title="The compass isn't rotating">
+    - **iOS** — The compass requires device motion and orientation access. When you first open the Compass page, a system prompt should appear asking for permission. Tap **Allow** to enable sensor access.
+    - **Android** — Ensure the orientation/rotation sensor is not disabled in your device's accessibility or developer settings. Some battery-saver modes also restrict sensor usage.
+    - **Manual slider fallback** — If sensor access is unavailable on your device, use the manual direction slider displayed on the Compass page to set your bearing toward Jerusalem.
+  </Accordion>
+
+  <Accordion title="I was never prompted for sensor access on iOS">
+    iOS only shows the device motion permission prompt **once**. If the prompt was dismissed or blocked, the system will not ask again automatically. To restore access:
+
+    1. **Uninstall and reinstall the PWA** — Remove the Zmanim Today icon from your home screen, reopen the site in Safari, and re-install. The permission prompt will appear fresh on the first launch.
+    2. **Clear site data in Safari** — Go to Settings → Safari → Advanced → Website Data, find Zmanim Today, and tap **Delete**. Then reopen the app and navigate to the Compass page.
+  </Accordion>
+</AccordionGroup>
+
+## Notifications
+
+<AccordionGroup>
+  <Accordion title="I'm not receiving reminder notifications">
+    1. **Check browser notification permission** — Open your browser settings and confirm that the notification permission for Zmanim Today is **Allowed**, not Blocked or Ask.
+    2. **Install as a PWA on iOS** — Apple only supports web push notifications for sites installed as PWAs from Safari. If you are accessing Zmanim Today as a regular tab, reminders will not fire. Follow the [installation steps](/help/faq#pwa-installation) to add the app to your home screen.
+    3. **Keep the browser or PWA open** — Ensure the Zmanim Today window or PWA is not fully closed. On some platforms, notifications require at least a background service worker to be active, which is only registered after the app has been opened.
+  </Accordion>
+
+  <Accordion title="Notifications stopped working after a browser update">
+    Browser updates occasionally reset notification permissions or service worker registrations. To restore reminders:
+
+    1. Open the **Reminders panel** by tapping the bell icon on the home screen.
+    2. Re-enable each reminder you want by tapping its **toggle switch** to turn it back on.
+    3. If prompted for notification permission again, tap **Allow**.
+
+    If the issue persists, check your browser's release notes — some updates require re-granting permissions site by site.
+  </Accordion>
+</AccordionGroup>
+
+## Siddur
+
+<AccordionGroup>
+  <Accordion title="Siddur content isn't loading">
+    Zmanim Today fetches siddur text from the **Sefaria API**. If content does not appear:
+
+    1. **Check your internet connection** — The siddur requires a live connection to retrieve text. Confirm you are online.
+    2. **Reload the page** — On mobile, close and reopen the app or refresh the page in your browser. This clears any stale state and fetches fresh content.
+    3. **Navigate away and back** — Tap to a different page (e.g., Home) and then return to the Siddur. This resets the siddur view and triggers a fresh load.
+  </Accordion>
+
+  <Accordion title="Some siddur sections are missing">
+    - **Sefaria coverage** — Sefaria may not have English translations for every liturgical section. When a translation is unavailable, Zmanim Today hides that section automatically to avoid displaying incomplete content.
+    - **Toggle to Hebrew-only mode** — If a section appears missing in bilingual view, try switching to **Hebrew-only** mode. The Hebrew source text has broader coverage than English translations.
+  </Accordion>
+</AccordionGroup>
+
+## General
+
+<AccordionGroup>
+  <Accordion title="The app looks outdated or broken">
+    1. **Clear the browser cache and hard-reload** — On desktop, press `Ctrl + Shift + R` (Windows/Linux) or `Cmd + Shift + R` (Mac) to bypass the cache and load the latest version.
+    2. **Uninstall and reinstall the PWA** — If you have Zmanim Today installed as a PWA, remove the icon from your home screen and reinstall it from the browser. This forces the service worker to fetch fresh assets.
+  </Accordion>
+</AccordionGroup>
+
+<Note>
+  If none of the above steps resolve your issue, try opening the app in a different browser to isolate whether the problem is browser-specific. For example, if you normally use Chrome, test in Firefox or Edge. This helps narrow down whether the issue lies with a browser setting, extension, or the app itself.
+</Note>

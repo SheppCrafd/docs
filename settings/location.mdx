@@ -1,0 +1,72 @@
+---
+title: "Managing Your Location in Zmanim Today"
+sidebarTitle: "Location"
+description: "Zmanim Today uses your GPS location or a city search to calculate accurate prayer times. Learn how to update, save, or clear your location."
+---
+
+Accurate zmanim depend entirely on knowing where you are. Zmanim Today supports two ways to set your location: automatic GPS detection via your browser, and a manual city or address search. Both methods store your coordinates and timezone locally so the app is ready the moment you open it — no account or sign-in required.
+
+## Automatic GPS Detection
+
+When you tap **Use My Location** on the Home screen, your browser will display a permission prompt asking whether Zmanim Today may access your device's location. Approving the prompt hands the app your latitude and longitude, which are immediately used to fetch today's zmanim.
+
+The app then runs two lookups in the background to enrich your location display:
+
+- **Reverse-geocoding** using BigDataCloud to resolve a human-readable city, state, and country name.
+- **Timezone lookup** using TimeAPI to confirm the correct local timezone for your physical coordinates — not just your device clock.
+
+Both lookups run in parallel and the results are merged into your saved location automatically. If either lookup fails, the app falls back gracefully to what it already has.
+
+Your location data is saved in your browser's local storage so it is available immediately the next time you open the app, without prompting again.
+
+If the browser permission is denied, the app asks you to search for your city manually instead.
+
+<Note>
+  Location data is stored exclusively in your browser's local storage and is never transmitted to any server operated by Zmanim Today. Your coordinates remain entirely on your device.
+</Note>
+
+## Manual City Search
+
+If GPS is unavailable or you prefer not to share your device location, you can type any city name or address into the search box on the Home screen. The app queries the [Open-Meteo Geocoding API](https://open-meteo.com/en/docs/geocoding-api) and resolves the best match, including fuzzy corrections for common typos (for example, "Tel Avv" resolves to Tel Aviv).
+
+**Tips for the search box:**
+
+- **City + country** — `Manchester, UK` — is the most reliable format when a city name is ambiguous.
+- **US state names** — entering a full state name such as `California` or `New Jersey` resolves directly to that state's geographic centre, which is useful for general state-level times.
+- **Short names** — drop words like "City", "Island", or "Country" from the query if you get no results on the first attempt.
+
+Confirmed results are saved to local storage with the same city/state/country/timezone structure used by GPS detection.
+
+<Tip>
+  Traveling before Shabbat or a Yom Tov? Search for your destination city **before you leave** so the dashboard already shows the correct candle-lighting and zmanim for where you will be observing.
+</Tip>
+
+## Viewing Your Saved Location
+
+Open **Settings** (the menu icon in the top-left corner of any screen). The **Location** section at the top of the Settings page displays your currently saved location in one of two formats:
+
+- **City, State, Country** — e.g. `Jerusalem, Jerusalem, Israel` — when a reverse-geocode name is available.
+- **Decimal coordinates** — e.g. `31.778°, 35.235°` — when only raw GPS coordinates have been stored and no city name has been resolved yet.
+
+Below the location name a small label reads *"Current location"* to confirm this is the active location used for all zmanim calculations.
+
+## Clearing Your Location
+
+To remove your saved location and start fresh:
+
+<Steps>
+  <Step title="Open Settings">
+    Tap the menu icon (☰) in the top-left corner of any page, then select **Settings**.
+  </Step>
+  <Step title="Find the Location section">
+    The **Location** card is at the top of the Settings page and shows your current city or coordinates.
+  </Step>
+  <Step title="Tap Clear">
+    Tap the red **Clear** button on the right side of the location card. Your saved location is immediately removed from local storage.
+  </Step>
+  <Step title="Set a new location">
+    Return to the Home screen and either tap **Use My Location** for GPS detection, or type a city in the search box to set a new location.
+  </Step>
+</Steps>
+
+After clearing, the Location section in Settings will display: *"No location set. Set one from the Home screen."*

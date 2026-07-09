@@ -1,0 +1,66 @@
+{
+  "projectType": "saas",
+  "projectName": "Zmanim Today",
+  "projectDescription": "Your personal Jewish prayer toolkit — Zmanim and compass to Jerusalem calculated accurately based on your current location.",
+  "theme": "almond",
+  "primaryColor": "#040404",
+  "lightColor": "#ffffff",
+  "darkColor": null,
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Guide",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "introduction",
+              "getting-started"
+            ]
+          },
+          {
+            "group": "Features",
+            "pages": [
+              "features/zmanim",
+              "features/compass",
+              "features/siddur",
+              "features/reminders"
+            ]
+          },
+          {
+            "group": "Settings & Customization",
+            "pages": [
+              "settings/location",
+              "settings/dashboard",
+              "settings/preferences"
+            ]
+          },
+          {
+            "group": "Help",
+            "pages": [
+              "help/faq",
+              "help/troubleshooting"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "Accurate daily zmanim (halachic prayer times) based on GPS or city search",
+    "Live countdown to the next upcoming zman",
+    "Jerusalem compass using device orientation sensor",
+    "Three built-in siddurim: Sephardic, Ashkenazi, and Chabad",
+    "Browser push-notification reminders for any zman",
+    "Hebrew calendar date, weekly Torah portion (Parsha), and Shabbat times",
+    "Customizable home dashboard with drag-and-drop reordering",
+    "12-hour / 24-hour time format toggle",
+    "Dark mode support",
+    "Printable daily zmanim sheets",
+    "Progressive Web App (PWA) — installable on mobile and desktop"
+  ],
+  "publicApiSurface": [
+    "Hebcal Zmanim API (https://www.hebcal.com/zmanim) — prayer times, Hebrew dates, Parsha",
+    "Sefaria API (https://www.sefaria.org/api) — siddur liturgical text content"
+  ]
+}

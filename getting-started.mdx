@@ -1,0 +1,77 @@
+---
+title: "Getting Started with Zmanim Today — Setup in Minutes"
+sidebarTitle: "Getting Started"
+description: "Open Zmanim Today in your browser, allow location access, and instantly see a personalised halachic prayer-times dashboard — no account required."
+---
+
+In just a few taps you can open Zmanim Today in your browser, grant location access, and immediately see a personalised dashboard showing every halachic prayer time for today at your exact location. There is no account to create, no app store to visit, and no setup beyond allowing the browser's standard location prompt. This guide walks you through the complete process — from opening the app to installing it on your home screen for instant daily access.
+
+## Steps to Get Up and Running
+
+<Steps>
+  <Step title="Open the app in your browser">
+    Navigate to the Zmanim Today URL in any modern browser. The app works on **iOS Safari**, **Android Chrome**, **Firefox**, and all major desktop browsers. No special plugins or extensions are required — the app loads entirely in the browser tab.
+  </Step>
+  <Step title="Allow location access">
+    As soon as the app loads it will request your location via a standard browser permission prompt. Tap or click **Allow** to let Zmanim Today read your GPS coordinates.
+
+    Your location is used solely to calculate accurate halachic times for your position — it is passed directly to the Hebcal API over a secure HTTPS connection and is never stored on any server. If you prefer not to share your GPS position you can skip this step and [search by city name](#searching-by-city) instead.
+  </Step>
+  <Step title="View your zmanim dashboard">
+    Once your location is confirmed, your personalised dashboard appears instantly. You will see:
+
+    - **Next Zman card** — a live countdown timer showing how long until the next upcoming prayer time, highlighted in amber when under 30 minutes.
+    - **Zmanim list** — a scrollable summary of every enabled halachic time-point for today, showing the time in your local timezone.
+    - **Mini Compass widget** — a compact animated compass pointing toward Jerusalem, showing the bearing in degrees and your distance to the city.
+
+    Tap any zman row to see a short description of what it means. Use the **Settings** gear icon to reorder items, hide zmanim you don't need, or switch to 24-hour time.
+  </Step>
+  <Step title="(Optional) Install as a PWA">
+    For the best mobile experience, install Zmanim Today as a Progressive Web App so it lives on your home screen like a native app — with a full-screen layout, faster load times, and support for push notification reminders.
+
+    See the [PWA installation instructions](#pwa-installation-by-platform) below for your platform.
+  </Step>
+</Steps>
+
+<Tip>
+  Installing Zmanim Today as a PWA is strongly recommended for regular use. The installed version launches full-screen, loads faster on repeat visits, and is required to receive push notification reminders for upcoming zmanim.
+</Tip>
+
+## PWA Installation by Platform
+
+<Tabs>
+  <Tab title="iOS">
+    iOS requires Safari for PWA installation. Make sure you are visiting the app in **Safari** — Chrome and Firefox on iOS cannot install PWAs.
+
+    1. Open Zmanim Today in **Safari**.
+    2. Tap the **Share** button (the box with an upward arrow) at the bottom of the screen.
+    3. Scroll down the share sheet and tap **Add to Home Screen**.
+    4. Edit the name if you wish, then tap **Add** in the top-right corner.
+    5. The Zmanim Today icon will appear on your home screen. Tap it to launch the app in full-screen mode.
+
+    <Warning>
+      On iOS, push notification reminders for upcoming zmanim require the app to be installed as a PWA first. Notifications are not supported when Zmanim Today is opened as a regular Safari browser tab.
+    </Warning>
+  </Tab>
+  <Tab title="Android">
+    Android supports PWA installation from **Chrome**, **Edge**, and most Chromium-based browsers.
+
+    **Chrome (recommended):**
+    1. Open Zmanim Today in **Chrome**.
+    2. Tap the **three-dot menu** (⋮) in the top-right corner of the browser.
+    3. Tap **Add to Home screen** (or **Install App** if Chrome detects the PWA manifest automatically and shows a banner).
+    4. Confirm by tapping **Add** in the dialogue that appears.
+    5. The app icon will appear on your home screen and in your app drawer.
+
+    **Install banner shortcut:**
+    Chrome may proactively show an **"Add Zmanim Today to Home screen"** banner at the bottom of the screen on your first visit. Tap **Install** on the banner to skip the menu steps above.
+  </Tab>
+</Tabs>
+
+## Searching by City
+
+If you decline the browser location prompt — or if you are planning ahead for travel — you can set your location by typing a city name instead of using GPS.
+
+On the home screen, tap the **Search** icon (magnifying glass) next to the location row, or tap the **Use My Location** button area to reveal the search field. Type any city, address, or place name — for example `Jerusalem`, `New York, NY`, or `London` — and tap the search button. Zmanim Today will resolve the place name to coordinates and calculate your prayer times for that location.
+
+Your searched location is saved locally on your device so it persists between sessions. You can clear or change it at any time from the **Settings** screen or by tapping **Change** next to the location label on the home screen.

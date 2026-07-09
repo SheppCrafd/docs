@@ -1,0 +1,89 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "name": "Zmanim Today",
+  "theme": "luma",
+  "colors": {
+    "primary": "#1D4ED8",
+    "light": "#3B82F6",
+    "dark": "#1D4ED8"
+  },
+  "logo": {
+    "light": "/images/1024.png",
+    "dark": "/images/1024.png",
+    "href": "https://zmanim-today-1f2656a3.base44.app/"
+  },
+  "favicon": {
+    "light": "/images/32.png",
+    "dark": "/images/32.png"
+  },
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Guide",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "introduction",
+              "getting-started"
+            ]
+          },
+          {
+            "group": "Features",
+            "pages": [
+              "features/zmanim",
+              "features/compass",
+              "features/siddur",
+              "features/reminders"
+            ]
+          },
+          {
+            "group": "Settings & Customization",
+            "pages": [
+              "settings/location",
+              "settings/dashboard",
+              "settings/preferences"
+            ]
+          },
+          {
+            "group": "Help",
+            "pages": [
+              "help/faq",
+              "help/troubleshooting"
+            ]
+          },
+          {
+            "group": "Technical Reference",
+            "icon": "code",
+            "pages": [
+              "technical/how-it-works"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "background": {
+    "color": {
+      "light": "#FFFFFF",
+      "dark": "#0B101D"
+    }
+  },
+  "navbar": {
+    "links": [
+      {
+        "href": "https://zmanim-today-1f2656a3.base44.app/",
+        "label": "Try the app now!"
+      }
+    ]
+  },
+  "appearance": {
+    "default": "light"
+  },
+  "fonts": {
+    "family": "Inter"
+  },
+  "styling": {
+    "eyebrows": "section"
+  }
+}

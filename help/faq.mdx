@@ -1,0 +1,107 @@
+---
+title: "Frequently Asked Questions — Zmanim Today"
+sidebarTitle: "FAQ"
+description: "Answers to common questions about Zmanim Today, including location accuracy, time calculation methods, siddur content, and PWA installation."
+---
+
+This page answers the most common questions about using Zmanim Today — from how location is handled and why times may vary, to siddur selection, reminders, and installing the app on your device.
+
+## Location & Times
+
+<AccordionGroup>
+  <Accordion title="Why do I need to share my location?">
+    Accurate zmanim depend on knowing your precise latitude and longitude. Solar events like sunrise, sunset, and twilight are all calculated based on geographic position — even a few miles of difference can shift times by several minutes. GPS is the most accurate method, giving Zmanim Today the exact coordinates it needs to compute halachically reliable times.
+  </Accordion>
+
+  <Accordion title="Can I use the app without sharing my GPS?">
+    Yes. If you prefer not to grant GPS access, use the **city search** field in the Location settings. Type your city name, select the matching result, and the app will use that city's coordinates to calculate your zmanim. This is slightly less precise than GPS but works well for most users.
+  </Accordion>
+
+  <Accordion title="Are my location data stored anywhere?">
+    No. Your location information is saved only on your own device and is never transmitted to any external server or third party. Clearing your browser's site data will remove it completely.
+  </Accordion>
+
+  <Accordion title="Why are my times slightly different from another zmanim app?">
+    Different apps may use different halachic opinions or rounding conventions. The two most common systems are:
+
+    - **GRA (Vilna Gaon)** — divides the day from sunrise to sunset into 12 equal seasonal hours.
+    - **MGA (Magen Avraham)** — divides the day from *alot hashachar* (dawn) to *tzet hakochavim* (nightfall), producing longer halachic hours and earlier deadlines.
+
+    Zmanim Today displays **both GRA and MGA times** for Shema and Tefillah so you can follow whichever opinion your community observes.
+  </Accordion>
+</AccordionGroup>
+
+## Features
+
+<AccordionGroup>
+  <Accordion title="What is the Next Zman countdown?">
+    The **Next Zman** countdown is a highlighted card displayed prominently on the home screen. It identifies the next upcoming prayer time or halachic milestone and shows a live, second-by-second countdown until that moment arrives. The card turns amber when the upcoming zman is less than 30 minutes away. Once the time passes, it automatically advances to the following zman.
+  </Accordion>
+
+  <Accordion title="What does Candle Lighting time represent?">
+    Candle Lighting marks the traditional time to light Shabbat candles — **18 minutes before sunset** on Friday afternoon. Lighting before this time fulfills the mitzvah and prevents the inadvertent violation of Shabbat. After Shabbat begins at sunset, candles may no longer be kindled.
+  </Accordion>
+
+  <Accordion title="What is Plag HaMincha?">
+    Plag HaMincha ("the half of Mincha") is **1.25 halachic hours before nightfall**. It is halachically significant as the earliest time one may begin Kabbalat Shabbat (the Friday evening service that ushers in Shabbat), allowing congregations to daven Maariv early on Friday. Consult your rabbi regarding your community's practice.
+  </Accordion>
+
+  <Accordion title="Which siddur should I use?">
+    Zmanim Today includes three siddur options:
+
+    | Siddur | Who It's For |
+    |--------|-------------|
+    | **Sephardic (Edot HaMizrach)** | Sephardic Jews following the Sephardic rite |
+    | **Ashkenazi (Nusach Ashkenaz)** | Most Ashkenazic Jews |
+    | **Chabad (Nusach Ari)** | Chabad-Lubavitch communities |
+
+    If you are unsure which tradition you follow, ask your rabbi or the synagogue you regularly attend.
+  </Accordion>
+</AccordionGroup>
+
+## Reminders
+
+<AccordionGroup>
+  <Accordion title="Why aren't my reminders firing?">
+    Reminders rely on browser push notifications. The two most common causes of silent reminders are:
+
+    1. **Notification permission not granted** — Open your browser settings and confirm that notifications for Zmanim Today are set to **Allowed**.
+    2. **iOS without PWA installation** — On Apple devices, web push notifications are only available when the app is installed as a PWA (added to your Home Screen from Safari). Reminders will not fire from a regular Safari browser tab on iOS.
+  </Accordion>
+
+  <Accordion title="How do I turn off a reminder?">
+    Tap the **bell icon** on the home screen to open the Reminders panel. Find the zman whose reminder you want to disable and tap its **toggle switch** to turn it off. The change takes effect immediately — no page reload is required.
+  </Accordion>
+</AccordionGroup>
+
+## PWA Installation
+
+<AccordionGroup>
+  <Accordion title="What is a PWA?">
+    A **Progressive Web App (PWA)** is a website that can be installed directly onto your device's home screen and behaves like a native mobile or desktop app. Benefits include:
+
+    - **Offline capability** — core content remains accessible without an internet connection.
+    - **Push notifications** — receive reminder alerts even when the browser tab is not open.
+    - **Full-screen experience** — runs without browser chrome for a cleaner look.
+
+    Zmanim Today is built as a PWA so it works seamlessly across iOS, Android, and desktop without requiring an app store download.
+  </Accordion>
+
+  <Accordion title="How do I install on iOS?">
+    1. Open Zmanim Today in **Safari** (other iOS browsers do not support PWA installation).
+    2. Tap the **Share** button (the box with an arrow pointing up).
+    3. Scroll down and tap **Add to Home Screen**.
+    4. Confirm the name and tap **Add**.
+
+    The app icon will appear on your home screen and open in full-screen mode.
+  </Accordion>
+
+  <Accordion title="How do I install on Android?">
+    1. Open Zmanim Today in **Chrome**.
+    2. Tap the **three-dot menu** (⋮) in the top-right corner.
+    3. Tap **Install App** (or **Add to Home Screen** on some versions).
+    4. Confirm by tapping **Install** in the prompt that appears.
+
+    Alternatively, Chrome may automatically display an **install banner** at the bottom of the screen — tap it to install directly.
+  </Accordion>
+</AccordionGroup>
