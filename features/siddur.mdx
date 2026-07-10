@@ -13,13 +13,15 @@ Zmanim Today ships with three full-length digital **siddurim** (prayer books) so
 Three prayer rites are available, each reflecting a distinct Jewish tradition:
 
 <CardGroup cols={3}>
-  <Card title="Sephardic Siddur" icon="book">
+  <Card title="Sephardic Siddur">
     **Edot HaMizrach** — the prayer rite of Sephardic and Mizrahi communities, following the traditions of Spain, North Africa, and the Middle East.
   </Card>
-  <Card title="Ashkenazi Siddur" icon="book">
+
+  <Card title="Ashkenazi Siddur">
     **Nusach Ashkenaz** — the traditional prayer rite of Ashkenazic Jewry from Central and Eastern Europe, used in most non-Chassidic Ashkenazi synagogues.
   </Card>
-  <Card title="Chabad Siddur" icon="book">
+
+  <Card title="Chabad Siddur">
     **Nusach Ari** — the Chabad-Lubavitch siddur, based on the Lurianic Kabbalah nusach compiled by the Alter Rebbe, Rabbi Schneur Zalman of Liadi.
   </Card>
 </CardGroup>
@@ -32,7 +34,7 @@ Tap any siddur card from the navigation menu to open it. Your font size preferen
 
 When you open a siddur you land on the **Table of Contents (TOC)** view. The TOC is built from Sefaria's live schema and presents the full hierarchical structure of the prayer book:
 
-- **Top-level categories** are shown as sticky section headers (e.g., *Shacharit*, *Mincha*, *Maariv*, *Shabbat*, *Holidays*).
+- **Top-level categories** are shown as sticky section headers (e.g., _Shacharit_, _Mincha_, _Maariv_, _Shabbat_, _Holidays_).
 - **Sub-categories and individual prayers** are nested beneath their parent with collapsible chevron toggles, allowing you to drill down to any specific prayer.
 - **Search bar** — a persistent search field sits at the top of the TOC. As you type, the tree filters recursively, expanding any branch that contains a matching node (by English title or Hebrew title). Clear the search to restore the full tree.
 
@@ -44,22 +46,20 @@ Tap any leaf entry in the TOC to jump directly to that prayer in the reader.
 
 Tapping a TOC entry opens the **Reader**, which renders the full text of the siddur starting from your chosen section:
 
-**Infinite scroll loading**
-Sections are loaded progressively as you scroll. When you approach the bottom of the currently loaded content, the next group of sections loads automatically. A loading spinner appears briefly while content is being fetched.
+**Infinite scroll loading** Sections are loaded progressively as you scroll. When you approach the bottom of the currently loaded content, the next group of sections loads automatically. A loading spinner appears briefly while content is being fetched.
 
-**Sticky section headers**
-Each section's title floats as a sticky header at the top of the viewport while you scroll through its content. The URL updates in sync with the visible section, so your exact reading position is always bookmarkable.
+**Sticky section headers** Each section's title floats as a sticky header at the top of the viewport while you scroll through its content. The URL updates in sync with the visible section, so your exact reading position is always bookmarkable.
 
-**Language modes**
-Three display modes are available via the toggle buttons at the top of the reader:
+**Language modes** Three display modes are available via the toggle buttons at the top of the reader:
 
 | Button | Mode | Description |
-|--------|------|-------------|
+| --- | --- | --- |
 | **HB** | Hebrew only | Displays Hebrew text right-to-left; English is hidden |
 | **EN** | English only | Displays the English translation; Hebrew is hidden |
 | **BOTH** | Bilingual | Hebrew and English displayed side by side on each row |
 
 **Font size**
+
 - **Touch screens** — pinch two fingers apart to zoom in, or pinch together to zoom out. The anchor row stays fixed so you don't lose your place.
 - **Desktop / trackpad** — hold `Ctrl` (or `⌘` on macOS) and scroll up/down to resize.
 - **Buttons** — use the `+` and `−` zoom buttons in the reader toolbar for precise control.
@@ -71,11 +71,12 @@ Three display modes are available via the toggle buttons at the top of the reade
 
 The URL updates automatically as you scroll through the siddur, encoding the current section index and language mode. For example:
 
-```
+```text
 /SephardicSiddur/section/42/both
 ```
 
 This means you can:
+
 - **Bookmark** any prayer directly in your browser.
 - **Share** a link to a specific prayer (e.g., Kiddush, Hallel, Kriyat Shema) with someone else who has the app.
 - **Navigate back** to exactly where you left off by reopening your bookmark.
@@ -85,9 +86,9 @@ Opening a deep link navigates straight to the correct section — the app loads 
 ---
 
 <Tip>
-Use the **search bar in the TOC** to jump instantly to the service you need. Type "shacharit", "mincha", "maariv", "kiddush", "hallel", or any Hebrew term to filter the tree and find the right section in seconds — no scrolling required.
+  Use the **search bar in the TOC** to jump instantly to the service you need. Type "shacharit", "mincha", "maariv", "kiddush", "hallel", or any Hebrew term to filter the tree and find the right section in seconds — no scrolling required.
 </Tip>
 
 <Note>
-All siddur content is provided by [Sefaria](https://www.sefaria.org) and the [Sefaria API](https://developers.sefaria.org) under open-source licensing. Zmanim Today does not host or modify the prayer texts.
+  All siddur content is provided by [Sefaria](https://www.sefaria.org) and the [Sefaria API](https://developers.sefaria.org) under open-source licensing. Zmanim Today does not host or modify the prayer texts.
 </Note>
