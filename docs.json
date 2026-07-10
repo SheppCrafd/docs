@@ -24,6 +24,7 @@
           {
             "group": "Overview",
             "pages": [
+              "home",
               "introduction",
               "getting-started",
               "installation"
