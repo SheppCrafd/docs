@@ -55,9 +55,7 @@
           },
           {
             "group": "Technical Reference",
-            "pages": [
-              "technical/how-it-works"
-            ]
+            "pages": []
           }
         ]
       }
