@@ -15,7 +15,7 @@ Zmanim Today's **Reminders** feature lets you set browser push notifications tha
     On the Home dashboard, tap the **bell icon** (🔔) in the top-right corner. If any reminders are already active, the icon changes to a ringing bell (🔔 with a blue dot indicator). The Reminders panel slides in from the right side of the screen.
   </Step>
   <Step title="Find the zman you want">
-    The panel lists all 16 zmanim in order from Alot HaShachar through Chatzot Laila. Each row shows the zman's emoji, name, and its calculated time for today (if a location is set). Candle Lighting is marked *(Fridays only)*. The "Havdalah / Tzait (72 min)" row — which covers Motzei Shabbat nightfall — is marked *(Saturdays only)*.
+    The panel lists all 16 zmanim in order from Alot HaShachar through Chatzot Laila. Each row shows the zman's emoji, name, and its calculated time for today (if a location is set). Candle Lighting is marked _(Fridays only)_. The "Havdalah / Tzait (72 min)" row — which covers Motzei Shabbat nightfall — is marked _(Saturdays only)_.
   </Step>
   <Step title="Toggle the reminder on">
     Tap anywhere on a zman row — or tap its toggle switch — to enable the reminder. The row highlights in blue to indicate it is active.
@@ -46,43 +46,29 @@ Reminders only fire for **today's** zmanim. If you browse to a past or future da
 
 Apple restricts browser push notifications to **installed PWAs** on iOS. If you are using Zmanim Today in Safari on an iPhone or iPad without having added it to your Home Screen, the Reminders panel will display an "Add to Home Screen" banner instead of the notification toggle.
 
-<Steps>
-  <Step title="Open Zmanim Today in Safari">
-    Navigate to the Zmanim Today URL in **Safari** (not Chrome or Firefox, which cannot install PWAs on iOS).
-  </Step>
-  <Step title="Tap the Share button">
-    Tap the **Share** button (the square with an upward arrow) in the Safari toolbar.
-  </Step>
-  <Step title='Choose "Add to Home Screen"'>
-    Scroll down in the Share sheet and tap **Add to Home Screen**. Confirm the name and tap **Add**.
-  </Step>
-  <Step title="Open the app from your Home Screen">
-    Tap the new Zmanim Today icon on your iOS Home Screen. The app opens in standalone (full-screen) mode — this unlocks the Web Push API on iOS.
-  </Step>
-  <Step title="Enable notifications">
-    Open the Reminders panel, tap **Enable Notifications**, and tap **Allow** when iOS prompts you. Your reminders are now active.
-  </Step>
-</Steps>
+Follow the [Installation guide](/installation) to add Zmanim Today to your Home Screen from Safari, then open it from the Home Screen icon (not from a Safari tab) — this unlocks the Web Push API on iOS. Once installed, open the Reminders panel, tap **Enable Notifications**, and tap **Allow** when iOS prompts you.
 
 ---
 
 ## Permissions
 
 <Warning>
-If browser notification permission is **denied**, reminders will not fire — the app cannot display notifications without explicit user permission, and there is no fallback. The Reminders panel will show a red warning: *"Notifications are blocked. Please allow them in your browser settings."*
+  If browser notification permission is **denied**, reminders will not fire — the app cannot display notifications without explicit user permission, and there is no fallback. The Reminders panel will show a red warning: _"Notifications are blocked. Please allow them in your browser settings."_
 
-To re-enable notifications after denying:
-- **Chrome / Edge (desktop):** Click the lock icon in the address bar → **Site settings** → set **Notifications** to **Allow**.
-- **Firefox (desktop):** Click the lock icon → **Connection secure** → **More information** → **Permissions** → remove the "Block" override for Notifications.
-- **Safari on macOS:** **System Settings → Notifications → Safari** → enable the site.
-- **iOS (PWA):** Go to **iOS Settings → [Your App Name]** → **Notifications** → toggle on.
+  To re-enable notifications after denying:
+
+  - **Chrome / Edge (desktop):** Click the lock icon in the address bar → **Site settings** → set **Notifications** to **Allow**.
+  - **Firefox (desktop):** Click the lock icon → **Connection secure** → **More information** → **Permissions** → remove the "Block" override for Notifications.
+  - **Safari on macOS:** **System Settings → Notifications → Safari** → enable the site.
+  - **iOS (PWA):** Go to **iOS Settings → \[Your App Name\]** → **Notifications** → toggle on.
 </Warning>
 
 ---
 
 <Tip>
-The most useful reminders to set:
-- **15 minutes before Candle Lighting** on Fridays — gives you time to finish cooking and get ready before Shabbat.
-- **10 minutes before Sof Zman Shema (GRA)** — ensures you never miss the latest time for the morning Shema.
-- **10 minutes before Sof Zman Tefillah (GRA)** — a safety net for Shacharit on busy mornings.
+  The most useful reminders to set:
+
+  - **15 minutes before Candle Lighting** on Fridays — gives you time to finish cooking and get ready before Shabbat.
+  - **10 minutes before Sof Zman Shema (GRA)** — ensures you never miss the latest time for the morning Shema.
+  - **10 minutes before Sof Zman Tefillah (GRA)** — a safety net for Shacharit on busy mornings.
 </Tip>
