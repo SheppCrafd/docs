@@ -35,8 +35,8 @@ Key zmanim include **Alot HaShachar** (dawn), **Netz HaChama** (sunrise), **Sof 
     Choose which zmanim appear on your home screen, re-order them by drag-and-drop, and toggle between 12-hour and 24-hour time formats. Dark mode is fully supported.
   </Card>
 
-  <Card title="PWA — Install on Any Device" icon="mobile" href="/getting-started">
-    Zmanim Today is a Progressive Web App. Install it on your iOS or Android home screen — or as a desktop app — for an offline-ready, full-screen experience without any app store download.
+  <Card title="Install on Any Device" icon="mobile" href="/installation">
+    Zmanim Today is a Progressive Web App. Install it on iOS, Android, or desktop for an offline-ready, full-screen experience without any app store download.
   </Card>
 </CardGroup>
 
@@ -45,7 +45,7 @@ Key zmanim include **Alot HaShachar** (dawn), **Netz HaChama** (sunrise), **Sof 
 - **Set your location** — on first open, the Home screen prompts you to tap **Use My Location** (which asks the browser for GPS permission) or to search for a city by name. Your coordinates and timezone are saved locally so the app remembers them next time.
 - **Times are calculated** — your latitude, longitude, and local timezone are sent to the Hebcal API, which returns every halachic time-point for the current date. Responses are memoised in `sessionStorage` so subsequent views load instantly.
 - **Your dashboard loads** — the home screen displays a live countdown to the next upcoming zman, a customisable list of today's prayer times, a mini Jerusalem compass, and print buttons for today's and tomorrow's zmanim.
-- **Install as an app** — use your browser's "Add to Home Screen" (iOS) or "Install App" (Android / desktop) option to pin Zmanim Today to your device for instant one-tap access, just like a native app.
+- **Install as an app** — pin Zmanim Today to your device for one-tap access. See [Installation](/installation) for platform-specific steps.
 
 <Note>
   Zmanim Today calculates prayer times entirely in the browser. Your coordinates are passed directly to the Hebcal, BigDataCloud, TimeAPI, and Open-Meteo public APIs over HTTPS as needed, and are never logged, stored, or shared by a Zmanim Today server — the app has none of its own.
