@@ -1,0 +1,238 @@
+---
+title: "How Zmanim Today Works — A Technical Breakdown"
+sidebarTitle: "How It Works"
+icon: "gears"
+description: "A page-by-page technical breakdown of the routes, hooks, APIs, storage keys, and calculations behind every screen in Zmanim Today."
+---
+
+Zmanim Today is a single-page React app (Vite \+ React Router) that runs **entirely in your browser**. There is no Zmanim Today backend — all data comes from public HTTPS APIs, and everything the app remembers about you lives in `localStorage` and `sessionStorage`. This page walks through the architecture, the routes, the hooks that fetch and normalise data, and the storage keys behind every feature.
+
+## General Explanation
+
+At a high level:
+
+```text
+┌────────────────────────────────────────────────┐
+│  Browser (React SPA)                            │
+│                                                 │
+│  ┌─────────────┐   ┌──────────────────────────┐  │
+│  │  Routes    │──▶│  Hooks (React Query)  │  │
+│  │  (pages)   │   │  useZmanim, useLocation │
+│  └─────────────┘   │  useSefaria, useCompass│  │
+│         │           └────────┬────────────────┘  │
+│         ▼                    ▼                    │
+│  ┌──────────────────────────────────────────┐   │
+│  │  localStorage + sessionStorage (per-device)  │   │
+│  └──────────────────────────────────────────┘   │
+└─────────────┬───────────────────────────────────────┘
+              │  HTTPS (fetch)
+              ▼
+┌──────────────────────────────────────────────────┐
+│  Public third-party APIs                        │
+│  • Hebcal      → zmanim + Hebrew date         │
+│  • Sefaria     → siddur text                   │
+│  • Open-Meteo  → city → lat/lng geocoding      │
+│  • BigDataCloud→ lat/lng → city reverse lookup │
+│  • TimeAPI     → IANA timezone from lat/lng    │
+└──────────────────────────────────────────────────┘
+```
+
+All network requests are made straight from the browser. The app has **no server of its own**, no analytics, and no telemetry.
+
+## Architecture at a Glance
+
+### Routes
+
+| Route | Component | What it does |
+| --- | --- | --- |
+| `/` | `pages/Home.jsx` | Dashboard: countdown, zmanim list, mini compass |
+| `/zmanim` | `pages/Zmanim.jsx` | Full zmanim table with date picker \+ reminders |
+| `/compass` | `pages/Compass.jsx` | Full-screen live compass to Jerusalem |
+| `/siddur/sephardic` | `pages/SephardicSiddur.jsx` | Siddur Edot HaMizrach reader |
+| `/siddur/ashkenazi` | `pages/AshkenaziSiddur.jsx` | Siddur Ashkenaz reader |
+| `/siddur/chabad` | `pages/ChabadSiddur.jsx` | Weekday Chabad siddur reader |
+| `/settings` | `pages/Settings.jsx` | Location, dashboard order, theme, time format |
+
+Routing is handled by `react-router-dom` in `App.jsx`. Every route renders inside the shared `NavMenu` bottom-tab layout.
+
+### Storage keys
+
+| Key | Where | Purpose |
+| --- | --- | --- |
+| `zmanim_saved_location` | `localStorage` | Your last-used location (city, coordinates, timezone). |
+| `zmanim_cache_v3` | `sessionStorage` | Hebcal zmanim responses keyed by `lat,lon,date,tzid`. |
+| `dashboard_prefs_v3` | `localStorage` | Which dashboard items are enabled \+ their order (schema version 3). |
+| `zmanim_reminders` | `localStorage` | Enabled reminders \+ per-zman lead time. |
+| `theme` | `localStorage` | `"light"` or `"dark"` (managed by `ThemeContext`). |
+| `siddur-font-scale` | `localStorage` | Reading-size multiplier applied to siddur pages. |
+| `siddur-empty-refs:<bookRef>` | `localStorage` | Cached list of empty Sefaria refs to skip on subsequent loads. |
+| `sefaria-text-v3` | `IndexedDB` | Cached siddur segment text via `lib/sefariaCache.js`. |
+
+Nothing is ever sent to a Zmanim Today server — there isn't one.
+
+## Home (`/`)
+
+The Home screen is the first thing you see and does most of the work.
+
+**Component:** `pages/Home.jsx`
+
+**Hooks used:**
+
+- `useSavedLocation()` — loads `zmanim_saved_location` from `localStorage`, exposes `detectGPS`, `searchLocation`, and `clearLocation`.
+- `useZmanim(location)` — fetches today's zmanim from Hebcal for the given location.
+- `useZmanim(location, tomorrow)` — pre-fetches tomorrow so the "Print Tomorrow" button is instant.
+- `useDashboardPrefs()` — reads `dashboard_prefs_v3` to know which cards to render and in what order.
+
+### What renders
+
+1. **Location bar** — shows city \+ country, or coordinates if no reverse-geocode succeeded. The **Change** button clears the saved location and re-shows the initial prompt.
+2. **Next Zman card** (`components/home/NextZmanCard.jsx`) — scans today's zmanim, finds the first one still in the future, and starts a `setInterval(1000)` countdown. Turns amber when \< 30 minutes remain.
+3. **Zmanim summary** (`components/home/ZmanimSummary.jsx`) — lists every enabled zman in the order set by `dashboard_prefs_v3`.
+4. **Mini compass** (`components/home/MiniCompass.jsx`) — small animated compass, only rendered if `compass` is enabled in dashboard prefs.
+5. **Print buttons** — call `lib/printZmanim.js` with today's or tomorrow's data.
+
+### First-run flow
+
+```text
+Home mounts
+  → useSavedLocation reads localStorage
+     → no saved location? show "Use My Location" + search box
+     → user taps Use My Location
+        → navigator.geolocation.getCurrentPosition()
+        → BigDataCloud reverse geocode  → city/state/country
+        → TimeAPI                      → IANA timezone
+        → localStorage.setItem("zmanim_saved_location", ...)
+     → useZmanim(location) now has coords → fetch Hebcal
+     → dashboard renders
+```
+
+## Zmanim page (`/zmanim`)
+
+**Component:** `pages/Zmanim.jsx`
+
+A full table of every halachic time-point for the selected date. Includes a date picker, per-zman toggle for reminders (via `components/zmanim/ZmanimRemindersPanel.jsx`), and a reference to the definition of each zman.
+
+**Zmanim source:** the [Hebcal Zmanim API](https://www.hebcal.com/home/197/jewish-calendar-rest-api), called from `hooks/useZmanim.js`:
+
+```text
+GET https://www.hebcal.com/zmanim?cfg=json&latitude=<lat>&longitude=<lon>&tzid=<tzid>&date=<YYYY-MM-DD>
+```
+
+The response is normalised inside the hook:
+
+- `applyDayRules()` — candle-lighting only on Friday; havdalah only on Saturday (derived from `tzait_hakochavim` at 8.5°).
+- `fixAlotHashachar()` — forces Alot HaShachar to exactly 72 minutes before sunrise (matches the Vilna Gaon convention used by most modern siddurim).
+- `fixCandleLighting()` — if Hebcal did not return an explicit time, derive it as 18 minutes before sunset.
+
+Results are cached in `sessionStorage` under `zmanim_cache_v3`, keyed by `lat.toFixed(3),lon.toFixed(3),date,tzid` — so returning to the page or scrubbing dates never re-hits the network within the same tab.
+
+## Compass (`/compass`)
+
+**Component:** `pages/Compass.jsx`
+
+Renders a full-screen animated compass rose that rotates to point at Jerusalem.
+
+**Hook:** `hooks/useCompassHeading.js`
+
+Subscribes to `deviceorientationabsolute` (Android) or `deviceorientation` with `event.webkitCompassHeading` (iOS). The raw heading is smoothed by interpolating 10% toward the target angle every animation frame:
+
+```js
+let diff = targetRef.current - smoothRef.current;
+if (diff > 180) diff -= 360;
+if (diff < -180) diff += 360;
+smoothRef.current = smoothRef.current + diff * 0.1;
+```
+
+The **bearing to Jerusalem** is computed with the standard great-circle initial-bearing formula, using Jerusalem's Old City coordinates `31.7767°N, 35.2345°E`. Rendered rotation = `bearing − heading`, so the arrow always points north-adjusted toward Jerusalem regardless of which way the phone faces.
+
+<Note>
+  iOS requires an explicit `DeviceOrientationEvent.requestPermission()` call inside a user gesture. The compass page shows an **Enable Compass** button on iOS to trigger it.
+</Note>
+
+## Siddur (`/siddur/*`)
+
+Three separate route components — `SephardicSiddur.jsx`, `AshkenaziSiddur.jsx`, `ChabadSiddur.jsx` — each mount `components/siddur/SiddurView.jsx` with a different top-level Sefaria book reference.
+
+**Hook:** `hooks/useSefaria.js`
+
+Uses `@tanstack/react-query` to fetch text from the [Sefaria API](https://www.sefaria.org/developers/api):
+
+```text
+GET https://www.sefaria.org/api/v3/texts/<ref>?version=hebrew&version=english&return_format=text_only
+```
+
+The hook merges Hebrew and English versions line-by-line, running each line through two guards:
+
+- `looksHebrew()` — detects Hebrew script by Unicode range `\u0590-\u05FF`.
+- `looksEnglish()` — requires an English marker word (`the`, `and`, `unto`, etc.) **and** rejects Iberian markers (Sefaria sometimes labels Portuguese as `en`).
+
+Empty refs are noted in `siddur-empty-refs:<bookRef>` in `localStorage` so the reader skips them on the next mount. Fetched segments are memoised in `IndexedDB` via `lib/sefariaCache.js` (`sefaria-text-v3`) for offline reading.
+
+The siddur schema (which top-level refs are shown, their order, and their labels) lives in `lib/siddurSchema.js`.
+
+## Settings (`/settings`)
+
+**Component:** `pages/Settings.jsx`
+
+A single scrolling page that groups every preference:
+
+- **Location** — re-run GPS, search a new city, or clear the saved location. Backed by `useSavedLocation()`.
+- **Dashboard** — drag-and-drop list of every zman \+ widget (`compass`, `next_zman`). Backed by `useDashboardPrefs()` and persisted to `dashboard_prefs_v3` (schema version 3 with automatic migration).
+- **Preferences** — theme (`ThemeContext` → `theme`), time format (12 h / 24 h, stored inside `dashboard_prefs_v3`).
+- **About / Data sources** — static links to Hebcal, Sefaria, and the other public APIs the app calls.
+
+## Reminders
+
+**Component:** `components/zmanim/ZmanimRemindersPanel.jsx`
+
+Opened by the bell icon on Home and on the Zmanim page. Persists to `localStorage` as `zmanim_reminders`:
+
+```json
+{
+  "sof_zman_shma_gra": { "enabled": true, "leadMinutes": 10 },
+  "mincha_gedola":     { "enabled": true, "leadMinutes": 15 }
+}
+```
+
+When the app is open, a `setTimeout` is scheduled for each active reminder at `zmanTime - leadMinutes`. When it fires, `Notification` is called with the zman label — no server push involved. On iOS this only works once the app has been installed to the Home Screen (see [Installation](/installation)).
+
+## Shared internals
+
+### `lib/timeUtils.js`
+
+Small helpers used by every page:
+
+- `formatTime(iso, use24h)` — renders `"14:37"` or `"2:37 PM"`.
+- `subtractMinutes(iso, n)` — used to derive Alot HaShachar and candle-lighting from sunrise/sunset.
+
+### `lib/hebrewDate.js`
+
+Calls Hebcal's `/converter` endpoint to render the current Hebrew date and weekly parsha:
+
+```text
+GET https://www.hebcal.com/converter?cfg=json&gy=<yyyy>&gm=<m>&gd=<d>&g2h=1
+```
+
+### `lib/zmanimSchema.js`
+
+Single source of truth for the 17 zmanim: id, display label, icon, and description. Referenced by both `useDashboardPrefs.js` and `pages/Zmanim.jsx`.
+
+### `lib/printZmanim.js`
+
+Builds a printer-friendly HTML document from a Hebcal response and opens it in a new window with `window.print()` — used by the two "Print" buttons on Home.
+
+### `lib/query-client.js`
+
+A single shared `QueryClient` from `@tanstack/react-query`, mounted at the app root. Zmanim fetches use `sessionStorage` directly (fast, per-tab), while siddur fetches use React Query so cross-page navigation is instant.
+
+## Third-party services (all public, HTTPS, keyless)
+
+| Service | Used for |
+| --- | --- |
+| **Hebcal** | Zmanim \+ Hebrew date \+ parsha (`/zmanim`, `/converter`). |
+| **Sefaria** | Siddur text (Hebrew \+ English versions, `/api/v3/texts`). |
+| **Open-Meteo** | Geocoding: city name → lat/lng/timezone. |
+| **BigDataCloud** | Reverse geocoding: lat/lng → city/state/country. |
+| **TimeAPI.io** | IANA timezone from lat/lng (used as a fallback when Open-Meteo omits the tz field). |
+
+All services are called directly from your browser over HTTPS. None require an account, an API key, or payment. Zmanim Today ships no keys of its own — there is nothing to leak.
