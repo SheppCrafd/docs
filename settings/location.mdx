@@ -22,7 +22,7 @@ Your location data is saved in your browser's local storage so it is available i
 If the browser permission is denied, the app asks you to search for your city manually instead.
 
 <Note>
-  Location data is stored exclusively in your browser's local storage and is never transmitted to any server operated by Zmanim Today. Your coordinates remain entirely on your device.
+  Your location is stored in your browser's local storage and sent only to the third-party APIs required to compute times: Hebcal (zmanim), BigDataCloud (reverse-geocode), TimeAPI (timezone), and Open-Meteo (city search). If you also enable **push reminders**, your coordinates are additionally stored alongside your Web Push subscription on the [base44](https://base44.com) backend so the scheduled reminder job can compute the correct zman time for your location.
 </Note>
 
 ## Manual City Search

@@ -4,7 +4,7 @@ sidebarTitle: "Reminders"
 description: "Set browser push notifications for any of the 16 daily zmanim in Zmanim Today and choose how many minutes in advance you want to be alerted."
 ---
 
-Zmanim Today's **Reminders** feature lets you set browser push notifications that fire a chosen number of minutes before any halachic time-point. Reminders work even when the browser tab is in the background — as long as the browser itself is running, you'll receive the notification at the right moment. This is especially useful for time-sensitive zmanim like Sof Zman Shema or Friday candle lighting, where missing the window has real halachic implications.
+Zmanim Today's **Reminders** feature lets you set Web Push notifications that fire a chosen number of minutes before any halachic time-point. Reminders are delivered by a scheduled backend job, so **they fire even when the app is closed** — the tab does not need to be open. This is especially useful for time-sensitive zmanim like Sof Zman Shema or Friday candle lighting, where missing the window has real halachic implications.
 
 ---
 
@@ -28,7 +28,7 @@ Zmanim Today's **Reminders** feature lets you set browser push notifications tha
   </Step>
 </Steps>
 
-Reminders are stored in `localStorage` and survive page reloads. Once set, they will fire automatically whenever you have the app open (or the browser running in the background) on the day the zman falls.
+Reminder toggles are stored in `localStorage` and survive page reloads. Under the hood, they're also synced to your Web Push subscription on the backend, so notifications continue to arrive even when the app is fully closed. The subscription is refreshed automatically whenever you toggle a reminder or change your location.
 
 ---
 
@@ -38,7 +38,7 @@ Reminders are stored in `localStorage` and survive page reloads. Once set, they 
 - **Change lead time** — tap a different minute button (5m / 10m / 15m / 30m) on any active reminder row at any time. The new lead time is saved immediately.
 - **View active reminders** — any zman with a reminder enabled shows a blue-highlighted row. The bell icon in the header also shows a blue dot badge whenever at least one reminder is active.
 
-Reminders only fire for **today's** zmanim. If you browse to a past or future date on the Zmanim page, a notice in the Reminders panel explains that notifications are only scheduled for the current day.
+Reminders fire on their **correct day only** — Candle Lighting on Fridays, Havdalah / Tzait (72 min) on Saturdays. Weekday zmanim fire every day. The Reminders panel also displays a note when you're viewing a non-today date, since the times shown in the list are for the selected date rather than the day the reminder will actually fire.
 
 ---
 

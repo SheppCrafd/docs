@@ -10,13 +10,13 @@ This page is a technical companion to the [feature guides](/features/zmanim). It
 
 ## General Explanation
 
-Zmanim Today runs entirely in your browser. There is no Zmanim Today server — the app is a static React bundle that reads your location, calls a handful of public APIs, and caches the results locally so subsequent views are instant.
+Zmanim Today is a static React PWA. Almost everything runs in your browser: location, zmanim math, siddur text caching, theme, and dashboard layout are all client-side. The one exception is **background push reminders**, which are delivered by a [base44](https://base44.com) backend that stores your Web Push subscription and fires notifications on schedule — even when the app is closed.
 
 At a high level, three things happen every time you open the app:
 
 1. **Locate you.** The `useSavedLocation` hook checks `localStorage` first; if nothing is saved it triggers the browser Geolocation API and enriches the result with a reverse-geocode (BigDataCloud) and a timezone lookup (timeapi.io).
-2. **Fetch the data for the current screen.** Home and Zmanim call **Hebcal** for prayer times and the Hebrew calendar. Compass needs no network — it does its own great-circle math. The three siddur routes stream text from **Sefaria** via TanStack Query.
-3. **Render from local preferences.** Dashboard layout, dark mode, time format, font scale, and reminders all live in `localStorage` and drive what each screen shows.
+2. **Fetch the data for the current screen.** Home and Zmanim call **Hebcal** for prayer times and the Hebrew calendar. Compass needs no network — it does its own great-circle math. The three siddur routes stream text from **Sefaria** via TanStack Query and cache each ref in IndexedDB forever.
+3. **Render from local preferences.** Dashboard layout, dark mode, time format, font scale, and reminder toggles all live in `localStorage`. Reminder toggles are also synced up to a `PushSubscription` entity on base44 so background push works.
 
 The diagram below traces one full render cycle end-to-end.
 
@@ -24,7 +24,7 @@ The diagram below traces one full render cycle end-to-end.
  ┌────────────────────────────┐  coords + date   ┌────────────────────────────┐
  │       Browser APIs       │─────────────────▶│        Hebcal API        │
  │Geolocation / DeviceOrient│                 │   /zmanim, /converter    │
- │ Notification / Storage   │◀─────────────────│     (JSON responses)     │
+ │ Notification / SW / Push │◀─────────────────│     (JSON responses)     │
  └────────────────────────────┘  times + parsha  └────────────────────────────┘
               │                                             │
               │                                             │
@@ -41,12 +41,14 @@ The diagram below traces one full render cycle end-to-end.
  │                       React UI (rendered per route)                   │
  │              Home · Zmanim · Compass · Siddur · Settings              │
  └──────────────────────────────────────────────────────────────────────────────┘
-                                     │
-                                     ▼
- ┌──────────────────────────────────────────────────────────────────────────────┐
- │           localStorage  ·  sessionStorage  ·  React Query cache       │
- │ preferences · reminders · saved location · zmanim cache · siddur text │
- └──────────────────────────────────────────────────────────────────────────────┘
+                     │                                     │
+     (reminder prefs + push subscription)                  ▼
+                     ▼                    ┌──────────────────────────────────────┐
+ ┌──────────────────────────────────┐    │ localStorage · sessionStorage        │
+ │  base44 backend                  │    │ IndexedDB · React Query cache        │
+ │  PushSubscription entity + cron  │    │ prefs · reminders · saved location   │
+ │  → Web Push (works app-closed)   │    │ zmanim cache · sefaria-text-cache    │
+ └──────────────────────────────────┘    └──────────────────────────────────────┘
 ```
 
 ---
@@ -89,7 +91,9 @@ Every persistent value the app writes to the browser is listed below.
 | `theme` | `localStorage` | `ThemeContext` |
 | `siddur-font-scale` | `localStorage` | `SiddurView` |
 | `siddur-empty-refs:<bookRef>` | `localStorage` | `SiddurView` |
-| `sefaria-text-v3` (query key) | React Query cache | `useSefaria` |
+| `zmanim_push_sub_id` | `localStorage` | `usePushReminders` |
+| `sefaria-text-cache` (`texts` store) | IndexedDB | `lib/sefariaCache.js` |
+| `["sefaria-text-v3", ref]` (query key) | React Query cache | `SiddurView` |
 
 ---
 
@@ -115,13 +119,12 @@ Two independent `useZmanim` calls fire in parallel so Friday's UI can show "Tomo
 
 ```js
 const showCompass   = prefs.items.find(i => i.id === 'compass')?.enabled;
-const showNextZman  = prefs.items.find(i => i.id === 'next_zman')?.enabled;
 const enabledZmanim = prefs.items
-  .filter(i => i.enabled && !['compass','next_zman'].includes(i.id))
+  .filter(i => i.enabled && i.id !== 'compass')
   .map(i => i.id);
 ```
 
-- `NextZmanCard` — iterates `ZMANIM_ORDERED_KEYS`, picks the first zman still in the future, and renders a `setInterval(…, 1000)` countdown. Card turns amber when `ms < 30 * 60 * 1000`.
+- `NextZmanCard` — **always rendered** (not gated by prefs). Iterates the zmanim schema, picks the first zman still in the future, and renders a `setInterval(…, 1000)` countdown. Card turns amber when `ms < 30 * 60 * 1000`.
 - `MiniCompass` — links to `/Compass`; renders a 64px SVG rose with `useCompassHeading()` driving the ring.
 - `ZmanimSummary` — the enabled zman rows in `enabledZmanim` order.
 - Friday-only "Tomorrow's Havdalah" card, sourced from `tomorrowZmanim`.
@@ -312,7 +315,7 @@ const { dark, toggleDark }                              = useTheme();
 
 ### Dashboard drag-and-drop
 
-Uses `@hello-pangea/dnd` (the maintained fork of `react-beautiful-dnd`). `ALL_DASHBOARD_ITEMS` has **19** entries: two widgets (`compass`, `next_zman`) plus all 17 zmanim from `ZMANIM_SCHEMA`.
+Uses `@hello-pangea/dnd` (the maintained fork of `react-beautiful-dnd`). `ALL_DASHBOARD_ITEMS` has **18** entries: the `compass` widget plus all 17 zmanim from `ZMANIM_SCHEMA`. The `NextZmanCard` on Home is not in this list — it's always shown.
 
 ```js
 const onDragEnd = (result) => {
@@ -448,40 +451,51 @@ Keyed by rounded coordinates \+ date \+ tzid, memoised for the tab lifetime:
 
 ---
 
-## Reminders — `components/zmanim/ZmanimRemindersPanel.jsx`
+## Reminders — `components/zmanim/ZmanimRemindersPanel.jsx` \+ `hooks/usePushReminders.js`
 
-The bell in the Home header. Persists to `localStorage['zmanim_reminders']` as `{ [key]: { enabled, minutesBefore } }`.
+The bell in the Home header. Local prefs persist to `localStorage['zmanim_reminders']` as `{ [key]: { enabled, minutesBefore } }` (16 keys — see below). Delivery uses **Web Push**: the browser subscribes to a push service (FCM on Chrome/Android, Apple Push on iOS/Safari, Mozilla autopush on Firefox), and the base44 backend fires the notification at the right time — including when the app is completely closed.
 
-### Scheduling
+### Push subscription flow
 
-Every render re-schedules today's `setTimeout` calls. Nothing is scheduled unless three conditions are all true:
-
-```js
-if (!zmanimData?.zmanim || !isToday || notifPermission !== 'granted') return;
-```
-
-For each enabled key it parses the zman time, applies the lead time, and fires a Notification API call:
+`usePushReminders({ prefs, notifPermission })` re-runs whenever prefs or permission change and at least one reminder is enabled:
 
 ```js
-const notifyAt = new Date(zmanTime.getTime() - pref.minutesBefore * 60_000);
-const delay    = notifyAt.getTime() - Date.now();
-if (delay < 0) return;
-
-const t = setTimeout(() => {
-  new Notification(`${emoji} ${label} in ${pref.minutesBefore} min`, {
-    body: `${label} is at ${timeStr}`,
-    icon: '/favicon.ico',
+const reg = await navigator.serviceWorker.register("/sw.js");
+await navigator.serviceWorker.ready;
+let sub = await reg.pushManager.getSubscription();
+if (!sub) {
+  sub = await reg.pushManager.subscribe({
+    userVisibleOnly: true,
+    applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
   });
-}, delay);
+}
+// POST subscription + location + prefs to base44
+const payload = {
+  endpoint: sub.endpoint,
+  p256dh: bufferToB64url(sub.getKey("p256dh")),
+  auth:   bufferToB64url(sub.getKey("auth")),
+  latitude:  location.latitude,
+  longitude: location.longitude,
+  timezone:  location.timezone || "",
+  city:      location.city || "",
+  country:   location.country || "",
+  prefs,
+};
 ```
 
-### Day-of-week gating
+The returned entity id is cached at `localStorage['zmanim_push_sub_id']` so subsequent syncs `update()` the existing subscription instead of creating a new one.
 
-Only two of the 16 rows have DOW rules:
+### Backend delivery
+
+A scheduled job on base44 recomputes zmanim per subscription (using the stored coordinates \+ timezone \+ prefs) and posts a Web Push message at `zmanTime − minutesBefore`. The service worker (`/sw.js`) receives the `push` event and shows the notification — no open tab required.
+
+### Day-of-week gating (client UI hint)
+
+The panel labels two rows so users know they'll only fire on the correct day:
 
 ```js
-if (key === 'candle_lighting' && todayDow !== 5) return; // Fridays only
-if (key === 'tzait_72'        && todayDow !== 6) return; // Saturdays only (Motzei Shabbat)
+if (key === "candle_lighting") dayNote = "(Fridays only)";
+if (key === "tzait_72")        dayNote = "(Saturdays only)"; // doubles as Havdalah
 ```
 
 The `havdalah` schema key is not listed in the reminders panel — the `tzait_72` row doubles as "Havdalah / Tzait (72 min)".
@@ -577,7 +591,9 @@ Everything the app fetches from a third-party origin, at a glance:
 | `api.bigdatacloud.net` | Reverse geocode | `useSavedLocation` |
 | `timeapi.io` | IANA timezone for coords | `useSavedLocation` |
 | `geocoding-api.open-meteo.com` | City search | `useSavedLocation` |
+| base44 (`PushSubscription` entity) | Store push sub \+ deliver reminders | `usePushReminders` |
+| Web Push service (FCM / APNs / autopush) | Deliver push message to device | Service worker `/sw.js` |
 
 <Note>
-  All requests are made client-side from the browser. Zmanim Today does not operate a proxy or logging layer — your coordinates go directly to these origins over HTTPS.
+  Every request except the push-subscription upsert is made client-side from the browser and goes directly to the third-party origin over HTTPS. Enabling **reminders** uploads your Web Push subscription (endpoint, keys) and location to the base44 backend so scheduled reminders can be delivered when the app is closed.
 </Note>
