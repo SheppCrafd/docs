@@ -41,13 +41,13 @@ The diagram below traces one full render cycle end-to-end.
  │                       React UI (rendered per route)                   │
  │              Home · Zmanim · Compass · Siddur · Settings              │
  └──────────────────────────────────────────────────────────────────────────────┘
-                     │                                     │
-     (reminder prefs + push subscription)                  ▼
+                     │                                  │
+     (reminder prefs + push subscription)               ▼
                      ▼                ┌──────────────────────────────────────┐
- ┌──────────────────────────────────┐    │ localStorage · sessionStorage        │
- │ base44 backend                │    │ IndexedDB · React Query cache        │
- │ PushSubscription entity + cron│    │ prefs · reminders · saved location   │
- │  → Web Push (works app-closed)│    │ zmanim cache · sefaria-text-cache    │
+ ┌──────────────────────────────────┐    │localStorage · sessionStorage      │
+ │ base44 backend                │    │IndexedDB · React Query cache      │
+ │ PushSubscription entity + cron│    │prefs · reminders · saved location │
+ │  → Web Push (works app-closed)│    │zmanim cache · sefaria-text-cache  │
  └──────────────────────────────────┘    └──────────────────────────────────────┘
 ```
 
