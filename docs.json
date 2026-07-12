@@ -57,7 +57,8 @@
           {
             "group": "Technical Reference",
             "pages": [
-              "technical/how-it-works"
+              "technical/how-it-works",
+              "technical/zman-calculations"
             ]
           }
         ]

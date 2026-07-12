@@ -380,74 +380,9 @@ Every successful result — GPS or search — is persisted as JSON at `localStor
 
 ## Zmanim data — `hooks/useZmanim.js`
 
-### Request
+Every screen that displays times ultimately calls `useZmanim(location, date)`. The hook issues a single `GET https://www.hebcal.com/zmanim` request (with `tzid` falling back to `Intl.DateTimeFormat().resolvedOptions().timeZone`), renames Hebcal's `camelCase` keys to canonical `snake_case`, runs three deterministic post-processing passes (`fixAlotHashachar`, `fixCandleLighting`, `applyDayRules`), and caches the result in `sessionStorage['zmanim_cache_v3']` keyed by `lat.toFixed(3),lon.toFixed(3),date,tzid` for the tab lifetime.
 
-```js
-fetch(
-  `https://www.hebcal.com/zmanim?cfg=json` +
-  `&latitude=${location.latitude}` +
-  `&longitude=${location.longitude}` +
-  `&date=${dateStr}` +
-  `&tzid=${encodeURIComponent(tzid)}`,
-);
-```
-
-`tzid` falls back to `Intl.DateTimeFormat().resolvedOptions().timeZone` when the saved location has no explicit zone.
-
-### Field mapping
-
-Hebcal's keys are renamed to the app's canonical snake\_case:
-
-```js
-const zmanimData = {
-  alot_hashachar:        data.times.alotHashachar,
-  misheyakir:            data.times.misheyakir,
-  sunrise:               data.times.sunrise,
-  sof_zman_shma_gra:     data.times.sofZmanShma,
-  sof_zman_shma_mga:     data.times.sofZmanShmaMGA,
-  sof_zman_tefillah_gra: data.times.sofZmanTfilla,
-  sof_zman_tefillah_mga: data.times.sofZmanTfillaMGA,
-  chatzot:               data.times.chatzot,
-  mincha_gedola:         data.times.minchaGedola,
-  mincha_ketana:         data.times.minchaKetana,
-  plag_hamincha:         data.times.plagHaMincha,
-  candle_lighting:       data.times.candleLighting || null,
-  sunset:                data.times.sunset,
-  tzait_hakochavim:      data.times.tzeit85deg,   // 8.5° below horizon
-  tzait_72:              data.times.tzeit72min,   // Rabbeinu Tam
-  chatzot_laila:         data.times.chatzotNight,
-};
-```
-
-### Post-processing
-
-Three deterministic passes run over every response (fresh or cached):
-
-```js
-function postProcess(result, date) {
-  return applyDayRules(
-    fixAlotHashachar(
-      fixCandleLighting(result)
-    ),
-    date,
-  );
-}
-```
-
-- `fixAlotHashachar` — force `alot_hashachar = sunrise − 72 min`.
-- `fixCandleLighting` — if Hebcal omitted `candleLighting`, derive `sunset − 18 min`.
-- `applyDayRules`:
-  - `candle_lighting` set to `null` on any day except Friday (`dow === 5`).
-  - `havdalah` set to `tzait_hakochavim` (i.e. 8.5°) on Saturday only (`dow === 6`), else `null`.
-
-### Cache
-
-Keyed by rounded coordinates \+ date \+ tzid, memoised for the tab lifetime:
-
-```js
-`${lat.toFixed(3)},${lon.toFixed(3)},${date},${tzid}`
-// stored under sessionStorage['zmanim_cache_v3']
-```
+For the full field-mapping table, per-zman formulas, and day-of-week rules, see [Zman Calculations](/technical/zman-calculations).
 
 ---
 
@@ -550,31 +485,32 @@ export function formatCountdown(ms) {
 
 ## Zmanim schema — `lib/zmanimSchema.js`
 
-Single source of truth for zmanim ordering, labels, groups, and day-of-week flags. Consumed by `NextZmanCard`, `ZmanimCard`, `Zmanim` page grouping, and the reminders panel.
+Single source of truth for zmanim ordering, labels, groups, and day-of-week flags. Consumed by `NextZmanCard`, `ZmanimCard`, the `Zmanim` page grouping, and the reminders panel.
 
 ```js
 export const ZMANIM_SCHEMA = [
-  { id: 'alot_hashachar',       group: 'morning',   highlight: false },
-  { id: 'misheyakir',           group: 'morning',   highlight: false },
-  { id: 'sunrise',              group: 'morning',   highlight: true  },
-  { id: 'sof_zman_shma_gra',    group: 'morning',   highlight: true  },
-  { id: 'sof_zman_shma_mga',    group: 'morning',   highlight: false },
-  { id: 'sof_zman_tefillah_gra',group: 'morning',   highlight: true  },
-  { id: 'sof_zman_tefillah_mga',group: 'morning',   highlight: false },
-  { id: 'chatzot',              group: 'afternoon', highlight: true  },
-  { id: 'mincha_gedola',        group: 'afternoon', highlight: false },
-  { id: 'mincha_ketana',        group: 'afternoon', highlight: false },
-  { id: 'plag_hamincha',        group: 'afternoon', highlight: false },
-  { id: 'candle_lighting',      group: 'evening',   highlight: true, fridayOnly: true   },
-  { id: 'sunset',               group: 'evening',   highlight: true  },
-  { id: 'tzait_hakochavim',     group: 'evening',   highlight: true  },
-  { id: 'tzait_72',             group: 'evening',   highlight: false },
-  { id: 'havdalah',             group: 'evening',   highlight: true, saturdayOnly: true },
-  { id: 'chatzot_laila',        group: 'evening',   highlight: false },
+  { id: 'alot_hashachar',        group: 'morning',   highlight: false },
+  { id: 'misheyakir',            group: 'morning',   highlight: false },
+  { id: 'sunrise',               group: 'morning',   highlight: true  },
+  { id: 'sof_zman_shma_mga',     group: 'morning',   highlight: false },
+  { id: 'sof_zman_shma_gra',     group: 'morning',   highlight: true  },
+  { id: 'sof_zman_tefillah_mga', group: 'morning',   highlight: false },
+  { id: 'sof_zman_tefillah_gra', group: 'morning',   highlight: true  },
+  { id: 'chatzot',               group: 'afternoon', highlight: true  },
+  { id: 'mincha_gedola',         group: 'afternoon', highlight: false },
+  { id: 'mincha_ketana',         group: 'afternoon', highlight: false },
+  { id: 'plag_hamincha',         group: 'afternoon', highlight: false },
+  { id: 'candle_lighting',       group: 'evening',   highlight: true, fridayOnly: true },
+  { id: 'sunset',                group: 'evening',   highlight: true  },
+  { id: 'tzait_hakochavim',      group: 'evening',   highlight: true  },
+  { id: 'tzait_72',              group: 'evening',   highlight: false },
+  { id: 'chatzot_laila',         group: 'evening',   highlight: false },
 ];
 ```
 
-`getGroupEntries(groupId, zmanimData, dayOfWeek)` returns the schema entries for a group with `fridayOnly` and `saturdayOnly` filtered by the current DOW.
+There are **16 schema entries**. Havdalah is not a separate entry — on Saturday, `applyDayRules` (in `useZmanim`) exposes `havdalah` as an alias for `tzait_hakochavim` (8.5°), and `getZmanLabel` swaps the display label to "Tzeit HaKochavim / Havdalah". `getGroupEntries(groupId, zmanimData, dayOfWeek)` returns the schema entries for a group with `fridayOnly` filtered by the current DOW.
+
+For per-zman formulas and Hebcal field mappings, see [Zman Calculations](/technical/zman-calculations).
 
 ---
 

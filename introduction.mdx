@@ -10,7 +10,7 @@ Zmanim Today is a browser-based Progressive Web App that puts everything you nee
 
 _Zmanim_ (זמנים, literally "times") are the halachic time-points that govern the Jewish prayer schedule throughout the day. Because they are derived from sunrise, sunset, and the length of the solar day — not a fixed clock — they shift every day and differ significantly depending on your geographic location. Classic authorities such as the Vilna Gaon (GRA) and Rabbi Avraham Gombiner (Magen Avraham / MG"A) each define these intervals slightly differently, which is why you will often see two values shown for the same prayer window.
 
-Key zmanim include **Alot HaShachar** (dawn), **Netz HaChama** (sunrise), **Sof Zman Shma** (the latest time to recite the Shema), **Chatzot** (halachic midday), **Mincha Gedola**, **Plag HaMincha**, **Shkiat HaChama** (sunset), and **Tzait HaKochavim** (nightfall). Zmanim Today calculates all of these — and more — for your precise coordinates, refreshed automatically each day.
+Zmanim Today calculates all 16 major time-points — from **Alot HaShachar** through **Chatzot Laila** — for your precise coordinates. See the [Zmanim feature guide](/features/zmanim) for the full list, or [Zman Calculations](/technical/zman-calculations) for the formulas behind each one.
 
 ## Key Features
 
@@ -48,7 +48,7 @@ Key zmanim include **Alot HaShachar** (dawn), **Netz HaChama** (sunrise), **Sof 
 - **Install as an app** — pin Zmanim Today to your device for one-tap access. See [Installation](/installation) for platform-specific steps.
 
 <Note>
-  Zmanim Today calculates prayer times entirely in the browser. Your coordinates are passed directly to the Hebcal, BigDataCloud, TimeAPI, and Open-Meteo public APIs over HTTPS as needed, and are never logged, stored, or shared by a Zmanim Today server — the app has none of its own.
+  Zmanim Today calculates prayer times entirely in the browser. Your coordinates are passed directly to the Hebcal, BigDataCloud, TimeAPI, and Open-Meteo public APIs over HTTPS as needed. If you enable [push reminders](/features/reminders), your Web Push subscription and coordinates are additionally stored on the [base44](https://base44.com) backend so notifications can be delivered when the app is closed — otherwise the app has no server of its own.
 </Note>
 
 ## Data Sources

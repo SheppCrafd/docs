@@ -1,0 +1,253 @@
+---
+title: "Zman Calculations"
+sidebarTitle: "Zman Calculations"
+description: "How Zmanim Today derives every halachic time-point — the source data, the formulas, day-of-week rules, and the deterministic post-processing applied to each response."
+---
+
+Every time value shown in the app is derived from a single Hebcal request and then adjusted by a handful of deterministic client-side passes. This page documents each of the 16 halachic time-points the app tracks — what it means, how it's computed, and which Hebcal field it maps from.
+
+---
+
+## Source of truth
+
+All base times come from a single call to the [Hebcal Zmanim REST API](https://www.hebcal.com/home/197/zmanim-halachic-times-api):
+
+```txt
+GET https://www.hebcal.com/zmanim
+    ?cfg=json
+    &latitude=<lat>
+    &longitude=<lon>
+    &date=<YYYY-MM-DD>
+    &tzid=<IANA timezone>
+```
+
+Hebcal returns ISO-8601 timestamps in the requested `tzid`. The app then renames Hebcal's `camelCase` keys to its canonical `snake_case`, runs three post-processing passes, and caches the result under `sessionStorage['zmanim_cache_v3']` keyed by `lat.toFixed(3),lon.toFixed(3),date,tzid` for the tab lifetime.
+
+### Halachic "hour" (sha'ah zmanit)
+
+Many zmanim are expressed in **halachic hours** rather than clock hours. A halachic hour is 1⁄12 of the daylight portion of the day, so its length varies by season and latitude:
+
+- **GRA (Vilna Gaon)** — daylight spans **sunrise → sunset**, so 1 halachic hour = `(sunset − sunrise) / 12`.
+- **MGA (Magen Avraham)** — daylight spans **alot hashachar → tzeit hakochavim**, producing longer hours and earlier morning deadlines.
+
+Hebcal computes both flavours; the app surfaces both wherever they differ.
+
+---
+
+## The 16 zmanim
+
+Ordered as they appear in `lib/zmanimSchema.js`. "Hebcal field" is the key returned in `data.times`.
+
+### Dawn & Morning
+
+<AccordionGroup>
+  <Accordion title="Alot HaShachar — עלות השחר">
+    **Dawn.** The first perceptible light before sunrise.
+
+    - **Formula:** `sunrise − 72 minutes` (fixed-clock, not seasonal).
+    - **Hebcal field:** `alotHashachar` (Hebcal's value is overwritten client-side).
+    - **Client override:** `fixAlotHashachar()` recomputes `sunrise − 72 min` from the returned `sunrise` timestamp so the value is consistent regardless of the opinion Hebcal used.
+  </Accordion>
+
+  <Accordion title="Misheyakir — משיכיר">
+    **Earliest time to don tallit and tefillin** — when there is enough light to recognise a casual acquaintance from four cubits away.
+
+    - **Formula:** Sun at ~10.2° below the horizon (Hebcal's default).
+    - **Hebcal field:** `misheyakir`.
+  </Accordion>
+
+  <Accordion title="Sunrise (HaNetz HaChamah) — הנץ החמה">
+    **Sunrise.** The moment the sun's upper limb crosses the visible horizon.
+
+    - **Formula:** Standard astronomical sunrise (sun's center at −0.833° accounting for atmospheric refraction and solar radius).
+    - **Hebcal field:** `sunrise`.
+  </Accordion>
+
+  <Accordion title="Sof Zman Shema (GRA) — סוף זמן קריאת שמע">
+    **Latest time to recite the morning Shema** per the Vilna Gaon.
+
+    - **Formula:** `sunrise + 3 halachic hours (GRA)`.
+    - **Hebcal field:** `sofZmanShma`.
+  </Accordion>
+
+  <Accordion title="Sof Zman Shema (MGA) — סוף זמן קריאת שמע">
+    **Latest Shema** per the Magen Avraham — the more stringent (earlier) opinion.
+
+    - **Formula:** `alot_hashachar + 3 halachic hours (MGA)`.
+    - **Hebcal field:** `sofZmanShmaMGA`.
+  </Accordion>
+
+  <Accordion title="Sof Zman Tefillah (GRA) — סוף זמן תפילה">
+    **Latest Shacharit (Shemoneh Esrei)** per the GRA.
+
+    - **Formula:** `sunrise + 4 halachic hours (GRA)`.
+    - **Hebcal field:** `sofZmanTfilla`.
+  </Accordion>
+
+  <Accordion title="Sof Zman Tefillah (MGA) — סוף זמן תפילה">
+    **Latest Shacharit** per the Magen Avraham.
+
+    - **Formula:** `alot_hashachar + 4 halachic hours (MGA)`.
+    - **Hebcal field:** `sofZmanTfillaMGA`.
+  </Accordion>
+</AccordionGroup>
+
+### Midday & Afternoon
+
+<AccordionGroup>
+  <Accordion title="Chatzot — חצות">
+    **Halachic midday** — the exact midpoint between sunrise and sunset (equivalent to solar noon at that longitude).
+
+    - **Formula:** `(sunrise + sunset) / 2`.
+    - **Hebcal field:** `chatzot`.
+  </Accordion>
+
+  <Accordion title="Mincha Gedola — מנחה גדולה">
+    **Earliest time for Mincha.**
+
+    - **Formula:** `chatzot + 0.5 halachic hours (GRA)` (≈ 30 min after Chatzot at equinox).
+    - **Hebcal field:** `minchaGedola`.
+  </Accordion>
+
+  <Accordion title="Mincha Ketana — מנחה קטנה">
+    **Preferred time for Mincha** — the ideal window.
+
+    - **Formula:** `sunset − 2.5 halachic hours (GRA)`.
+    - **Hebcal field:** `minchaKetana`.
+  </Accordion>
+
+  <Accordion title="Plag HaMincha — פלג המנחה">
+    **The halfway point of the Mincha Ketana → sunset interval.** Earliest time one may accept Shabbat (and, for those who follow this opinion, daven Maariv early).
+
+    - **Formula:** `sunset − 1.25 halachic hours (GRA)`.
+    - **Hebcal field:** `plagHaMincha`.
+  </Accordion>
+</AccordionGroup>
+
+### Evening & Night
+
+<AccordionGroup>
+  <Accordion title="Candle Lighting — הדלקת נרות">
+    **Shabbat / Yom Tov candle lighting time.**
+
+    - **Formula:** `sunset − 18 minutes` (fixed-clock).
+    - **Hebcal field:** `candleLighting` when Hebcal supplies it; otherwise derived client-side by `fixCandleLighting()` from `sunset − 18 min`.
+    - **Day rule:** Set to `null` on any day except Friday (`applyDayRules`, `dow === 5`). Communities that light early — 40 minutes or 30 minutes before sunset — will need to adjust manually; the app uses the common 18-minute convention.
+  </Accordion>
+
+  <Accordion title="Sunset (Shkiyat HaChamah) — שקיעה">
+    **Sunset.** The moment the sun's upper limb drops below the visible horizon.
+
+    - **Formula:** Standard astronomical sunset (sun's center at −0.833°).
+    - **Hebcal field:** `sunset`.
+  </Accordion>
+
+  <Accordion title="Tzeit HaKochavim — צאת הכוכבים">
+    **Nightfall** — three medium stars visible. On Saturday this same value is displayed as **Havdalah**.
+
+    - **Formula:** Sun at **8.5° below the horizon** (Hebcal's `tzeit85deg`).
+    - **Hebcal field:** `tzeit85deg`.
+    - **Day rule:** On Saturday (`dow === 6`), `applyDayRules` sets a virtual `havdalah` field equal to this value; the label on the UI switches to "Tzeit HaKochavim / Havdalah".
+  </Accordion>
+
+  <Accordion title="Tzait (72 min) — צאת 72 דקות">
+    **Nightfall per Rabbeinu Tam** — the stringent opinion used for ending Shabbat by many communities.
+
+    - **Formula:** `sunset + 72 minutes` (fixed-clock).
+    - **Hebcal field:** `tzeit72min`.
+    - **UI note:** Hidden on Saturday to reduce clutter on the full Zmanim page (the Tzeit / Havdalah row already covers Motzei Shabbat).
+  </Accordion>
+
+  <Accordion title="Chatzot Laila — חצות לילה">
+    **Halachic midnight** — the exact midpoint of the halachic night.
+
+    - **Formula:** `(sunset + next-day sunrise) / 2`, equivalent to `chatzot + 12 halachic hours`.
+    - **Hebcal field:** `chatzotNight`.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Post-processing pipeline
+
+Every Hebcal response — fresh or served from the session cache — is passed through three deterministic passes before the UI sees it (`hooks/useZmanim.js`):
+
+```js
+function postProcess(result, date) {
+  return applyDayRules(
+    fixAlotHashachar(
+      fixCandleLighting(result)
+    ),
+    date,
+  );
+}
+```
+
+### 1. `fixAlotHashachar`
+
+Overwrites Hebcal's `alotHashachar` with a computed `sunrise − 72 min` so the value is consistent across dates and locations regardless of which underlying opinion Hebcal used.
+
+### 2. `fixCandleLighting`
+
+If Hebcal already returned a `candleLighting` value (Fridays and Yom Tov eves), it is kept as-is. Otherwise, the app synthesises `sunset − 18 min` so the field is always populated on Fridays even when Hebcal omits it.
+
+### 3. `applyDayRules`
+
+Applied per render based on the selected date's day of week:
+
+| Day of week | Rule |
+| --- | --- |
+| Friday (`dow === 5`) | `candle_lighting` kept; all other days it's set to `null` |
+| Saturday (`dow === 6`) | `havdalah = tzait_hakochavim` (8.5°); all other days it's `null` |
+
+This is why Candle Lighting and Havdalah rows only appear on their respective days — the fields themselves are `null` outside those days.
+
+---
+
+## Field mapping table
+
+A one-glance reference for developers reading the source:
+
+| App key | Hebcal field | Formula |
+| --- | --- | --- |
+| `alot_hashachar` | `alotHashachar` (overwritten) | `sunrise − 72 min` |
+| `misheyakir` | `misheyakir` | Sun at ~10.2° below horizon |
+| `sunrise` | `sunrise` | Astronomical sunrise |
+| `sof_zman_shma_gra` | `sofZmanShma` | `sunrise + 3 halachic hrs (GRA)` |
+| `sof_zman_shma_mga` | `sofZmanShmaMGA` | `alot_hashachar + 3 halachic hrs (MGA)` |
+| `sof_zman_tefillah_gra` | `sofZmanTfilla` | `sunrise + 4 halachic hrs (GRA)` |
+| `sof_zman_tefillah_mga` | `sofZmanTfillaMGA` | `alot_hashachar + 4 halachic hrs (MGA)` |
+| `chatzot` | `chatzot` | `(sunrise + sunset) / 2` |
+| `mincha_gedola` | `minchaGedola` | `chatzot + 0.5 halachic hrs (GRA)` |
+| `mincha_ketana` | `minchaKetana` | `sunset − 2.5 halachic hrs (GRA)` |
+| `plag_hamincha` | `plagHaMincha` | `sunset − 1.25 halachic hrs (GRA)` |
+| `candle_lighting` | `candleLighting` (or derived) | `sunset − 18 min` — Fridays only |
+| `sunset` | `sunset` | Astronomical sunset |
+| `tzait_hakochavim` | `tzeit85deg` | Sun at 8.5° below horizon |
+| `tzait_72` | `tzeit72min` | `sunset + 72 min` |
+| `chatzot_laila` | `chatzotNight` | `(sunset + next sunrise) / 2` |
+
+<Note>
+  There is no separate `havdalah` stored field. On Saturday, `applyDayRules` sets a virtual `havdalah` equal to `tzait_hakochavim` (8.5°). Communities that end Shabbat with Rabbeinu Tam's 72-minute nightfall can use the **Tzait (72 min)** row instead.
+</Note>
+
+---
+
+## Caching
+
+Results are cached in `sessionStorage['zmanim_cache_v3']` keyed as:
+
+```txt
+<lat.toFixed(3)>,<lon.toFixed(3)>,<YYYY-MM-DD>,<tzid>
+```
+
+Coordinates are rounded to 3 decimal places (~110 m) so tiny GPS jitter doesn't invalidate the cache. Day-of-week rules are applied on read, so the same cached response can render correctly for any date — only the rendered `candle_lighting` and `havdalah` fields flip.
+
+---
+
+## Accuracy notes
+
+- Times are computed by Hebcal using well-known solar algorithms and rounded to the second in Hebcal's response, then formatted to the minute in the UI. Expect ±1 minute of variance versus other reputable calculators.
+- **Alot HaShachar** uses the fixed 72-minute definition. Communities using degree-based dawn (e.g. 16.1°, 19.8°) will see different values elsewhere; the app does not surface those.
+- **Candle Lighting** uses the widespread 18-minute convention. Jerusalem (40 min), Haifa (30 min), Petach Tikva (~40 min), and other communities with local customs will need to subtract additional minutes manually.
+- Coordinates are truncated to 3 decimals for caching but sent to Hebcal at full precision — the truncation only affects cache hit/miss, not the calculation.
