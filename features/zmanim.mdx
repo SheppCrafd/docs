@@ -4,7 +4,7 @@ sidebarTitle: "Zmanim"
 description: "Zmanim Today calculates all 17 daily halachic time-points from your GPS location, displaying a live countdown to the next upcoming zman."
 ---
 
-Jewish law prescribes precise time-windows for prayer, Torah study, and religious observance. These time-windows — called **zmanim** (זמנים, "times") — are not fixed on the clock but shift every day based on the length of daylight at your exact latitude and longitude. Reciting Shema too late, praying Shacharit past its deadline, or lighting Shabbat candles after sunset are halachic concerns that affect Jewish communities worldwide. Zmanim Today removes that uncertainty by calculating every relevant time-point directly from your GPS coordinates using the authoritative [Hebcal API](https://www.hebcal.com/home/197/zmanim-halachic-times-api).
+Jewish law has a set of precise times for prayer, Torah study, and religious observance. These times — called **zmanim** (זמנים, "times") — shift every day based on the length of daylight at your exact latitude and longitude. Reciting Shema too late, praying Shacharit past its deadline, or lighting Shabbat candles after sunset are halachic concerns that affect Jewish communities worldwide. Zmanim Today removes that uncertainty by calculating every relevant time-point directly from your GPS coordinates using the authoritative [Hebcal API](https://www.hebcal.com/home/197/zmanim-halachic-times-api).
 
 ---
 
@@ -12,9 +12,9 @@ Jewish law prescribes precise time-windows for prayer, Torah study, and religiou
 
 The **Home** screen is your daily command center. As soon as the app detects your location it presents:
 
-- **Next Zman countdown card** — a prominent card at the top showing the name, Hebrew label, and a live ticking countdown to the very next upcoming zman. The countdown format compacts as it shrinks: `Xh Ym` when at least an hour remains, `Xm Ys` when under an hour, and `Xs` in the final minute. The card highlights in amber once fewer than 30 minutes remain, and rolls to the following zman automatically once the current one passes.
+- **Next Zman countdown card** — a card at the top showing the name, Hebrew label, and a live countdown to the next upcoming zman. The countdown format compacts as it shrinks: `h : m` when at least an hour remains, `m : s` when under an hour, and `s` in the final minute. The card highlights in amber once fewer than 30 minutes remain, and updates to the next zman automatically once the current one passes.
 - **Zmanim summary list** — a scrollable list of today's highlighted times rendered as clean cards beneath the countdown. Each row shows the zman's emoji icon, English name, and formatted time. You can customize which zmanim appear here from the Settings page.
-- **MiniCompass widget** — a compact Jerusalem-direction indicator (see the [Compass](/features/compass) page) that sits above the zmanim list and can be toggled in Settings.
+- **Mini Compass widget** — a compact Jerusalem compass rose (see the [Compass](/features/compass) page) that sits above the zmanim list and can be toggled in Settings.
 - **Bell icon (Reminders)** — tap to open the Reminders panel and configure push-notification alerts for any zman.
 - **Print buttons** — one-tap buttons to generate a printable zmanim sheet for today or tomorrow.
 
@@ -24,7 +24,7 @@ Tap **View full zmanim list** at the bottom of the home screen to open the dedic
 
 ## Complete List of Zmanim
 
-Zmanim Today tracks 16 halachic time-points, grouped into **Dawn & Morning**, **Midday & Afternoon**, and **Evening & Night**:
+Zmanim Today tracks 16 halachic times, grouped into **Dawn & Morning**, **Midday & Afternoon**, and **Evening & Night**:
 
 - **Dawn & Morning** — Alot HaShachar, Misheyakir, Sunrise, Sof Zman Shema (GRA & MGA), Sof Zman Tefillah (GRA & MGA)
 - **Midday & Afternoon** — Chatzot, Mincha Gedola, Mincha Ketana, Plag HaMincha
@@ -38,11 +38,11 @@ For the meaning, Hebrew term, formula, and Hebcal source of every zman above, se
 
 At the top of the full Zmanim page, alongside the date picker, the app displays:
 
-- **Hebrew date** — shown in Hebrew script (right-to-left) with a transliterated version below, e.g. _כ״ה אייר תשפ״ה / 25 Iyyar 5785_.
+- **Hebrew date** — shown in Hebrew text (right-to-left) with a transliterated version below, e.g. _כ״ה אייר תשפ״ה / 25 Iyyar 5785_.
 - **Day of the week** — in Hebrew with transliteration.
 - **Parsha** — the weekly Torah portion read on the upcoming Shabbat, shown in both Hebrew and English, e.g. _פרשת בְּחֻקֹּתַי / Parashat Bechukotai_.
 
-Hebrew calendar data is fetched from the Hebcal API alongside the zmanim calculation, so no extra request is needed.
+Hebrew calendar data is fetched from the Hebcal API alongside the zmanim calculation.
 
 ---
 
@@ -52,20 +52,20 @@ The Zmanim page includes a full **date picker** that lets you look up halachic t
 
 - Tap the **left arrow (‹)** to go back one day; tap the **right arrow (›)** to advance one day.
 - Tap the **date button** in the center to open a calendar popover and jump to any date directly.
-- Tap **Today** to instantly return to the current date.
+- Tap **Today** to return to the current date.
 - All times and the Hebrew date/Parsha display update automatically whenever the date changes.
 
 ---
 
 ## Time Format
 
-Zmanim Today supports both **12-hour (AM/PM)** and **24-hour** clock formats. Toggle between them in **Settings → Time Format → 24-Hour Time**. The preference is applied instantly across the home dashboard, the full Zmanim page, and printed sheets — no page reload required.
+Zmanim Today supports both **12-hour (AM/PM)** and **24-hour** clock formats. Toggle between them in **Settings → Time Format → 24-Hour Time**. The preference is applied instantly across the home dashboard, the full Zmanim page, and printed sheets.
 
 ---
 
 ## Printing Zmanim
 
-A **print button** (🖨) appears on both the Home dashboard and the full Zmanim page whenever times have been calculated. Tapping it opens your browser's print dialog with a clean, formatted zmanim sheet that includes:
+A **print button** appears on both the Home dashboard and the full Zmanim page whenever times have been calculated. Tapping it opens your browser's print dialog with a clean, formatted zmanim sheet that includes:
 
 - Location name and coordinates
 - Gregorian and Hebrew date
