@@ -8,13 +8,13 @@
     "dark": "#1D4ED8"
   },
   "logo": {
-    "light": "/images/1024.png",
-    "dark": "/images/1024.png",
+    "light": "/images/Untitleddesign(37).png",
+    "dark": "/images/Untitleddesign(37).png",
     "href": "https://zmanimtoday.mintlify.site/"
   },
   "favicon": {
-    "light": "/images/32.png",
-    "dark": "/images/32.png"
+    "light": "/images/favicon-32x32.png",
+    "dark": "/images/favicon-32x32.png"
   },
   "navigation": {
     "tabs": [
